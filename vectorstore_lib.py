@@ -1,0 +1,51 @@
+import subprocess
+from langchain.vectorstores import Chroma
+# my modules
+import enrich_metadata
+
+def splitting_of_docs(documents, splitter) :
+    return splitter.split_documents(documents)  # list of documents (attributs page_content, metadata)
+
+def new_vectordb(chunks, embedding, persist_directory) :
+    vectordb = Chroma.from_documents(
+        documents=chunks,
+        embedding=embedding,
+        persist_directory=persist_directory
+    )
+    return vectordb
+
+def create_vector_db(docs, data_dir, splitter, embedding, persist_directory, enrich_with_name=True, llm='default') :
+    subprocess.run('mkdir ' + persist_directory, shell=True)  # pire des cas il existe deja
+    list_of_names_as_str = ""
+    if docs == [] :  # on avait deja load et cree la vectordb, donc on recharge tel quel
+        vectordb = Chroma(
+            persist_directory=persist_directory,
+            embedding_function=embedding
+        )
+        list_of_names = []
+        metadatas = vectordb.get(include=['metadatas'])['metadatas']
+        if 'name' in metadatas[0] : # il y avait des noms dans les metadonnees
+            for doc_meta in metadatas :
+                name = doc_meta['name']
+                if name not in list_of_names :
+                    list_of_names.append(name)
+        list_of_names_as_str = ", ".join(list_of_names)
+    else :
+        if enrich_with_name :
+            docs, list_of_names_as_str = enrich_metadata.add_name_as_metadata(docs, data_dir, llm)
+        chunks = splitting_of_docs(docs, splitter)
+        vectordb = new_vectordb(chunks, 
+                                embedding, 
+                                persist_directory
+        )
+    vectordb.persist() # utile ?
+    return vectordb, list_of_names_as_str
+
+def retrieving(retriever_obj, question, retriever_type="vectordb", with_scores=True) :
+    if retriever_type == "vectordb" :  # retriever_obj est un vectordb
+        if with_scores == True :
+            return retriever_obj.similarity_search_with_score(question, k=5)  # lower is better
+        else :
+            return retriever_obj.as_retriever(search_type="similarity").get_relevant_documents(question, k=5)
+    else :                             # retriever_obj est un retriever
+        return retriever_obj.get_relevant_documents(question, k=6, fetch_k = 6) # todo : equivalent a vectordb.similarity_search(question, k opt) ??
