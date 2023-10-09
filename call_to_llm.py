@@ -1,6 +1,10 @@
 from langchain.chains import LLMChain
 
 def create_context_from_retrieved_chunks(docs) :
+    '''Concatenate the content of retrieved documents as a context to be fed to the llm
+    Input: a list of documents
+    Output: a string
+    '''
     context = ""
     if len(docs) != 0 :
         if type(docs[0]) == tuple :  # case if scores have been attached (doc[1]=score)
@@ -18,6 +22,12 @@ def create_chain(llm, prompt) :  # le retrieving sera fait manuellement pour le 
     return LLMChain(llm=llm, prompt=prompt)
 
 def get_result(chain, sources, question, print_source_docs=True, print_scores=True) :
+    '''Call the llm on retrieved chunks with the provided question.
+    Options to print source chunks and scores.
+    Scores will only be printed if they were provided with the source chunks (as an output of the retriever)
+    Sources are automatically printed if scores were asked for.
+    Output: list of results [{'text': '...'},...]
+    '''
     context = create_context_from_retrieved_chunks(sources)
     inputs = [{"context" : context, "question" : question}]
     # partie affichage avec les arguments optionnels
@@ -30,7 +40,7 @@ def get_result(chain, sources, question, print_source_docs=True, print_scores=Tr
             except TypeError :  # en fait on n'a pas calculé les scores donc doc est juste un Document
                 print("No scores computed with this retrieving method")
                 break  # on affichera les sources sans scores
-    elif print_source_docs == True :
+    elif print_source_docs == True or print_scores == True:
         print("\n** source chunks **\n" + context)
     return chain.apply(inputs)   # liste de résultats de type {'text': '...'}, mm taille que inputs
     # todo : voir comment on pourrait passer un seul input plutôt qu'une liste

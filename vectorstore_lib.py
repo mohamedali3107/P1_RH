@@ -15,6 +15,11 @@ def new_vectordb(chunks, embedding, persist_directory) :
     return vectordb
 
 def create_vector_db(docs, data_dir, splitter, embedding, persist_directory, enrich_with_name=True, llm='default') :
+    '''Create or recover the vectorstore, based on wether persist_directory already has content.
+    Option to add the names of candidates as metadata (or recover it if possible).
+    Along with the vectorstore, provide the list of names as a string (empty if names were not asked for or could not be recovered)
+    Output: tuple (vectorstore, string)
+    '''
     subprocess.run('mkdir ' + persist_directory, shell=True)  # pire des cas il existe deja
     list_of_names_as_str = ""
     if docs == [] :  # on avait deja load et cree la vectordb, donc on recharge tel quel
@@ -42,6 +47,8 @@ def create_vector_db(docs, data_dir, splitter, embedding, persist_directory, enr
     return vectordb, list_of_names_as_str
 
 def retrieving(retriever_obj, question, retriever_type="vectordb", with_scores=True) :
+    '''Retrieving based on either a vectorstore as retriever (similarity search) or a specified retriever.
+    Option to print relevance scores (will only work with a vectorstore as of now)'''
     if retriever_type == "vectordb" :  # retriever_obj est un vectordb
         if with_scores == True :
             return retriever_obj.similarity_search_with_score(question, k=5)  # lower is better
