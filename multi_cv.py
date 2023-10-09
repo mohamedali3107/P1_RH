@@ -99,9 +99,10 @@ retriever_with_filter = SelfQueryRetriever.from_llm(
     #search_type="mmr"  # marche moins bien, pour les noms en tout cas
 )
 retriever_obj = retriever_with_filter
-template = prompt_multi_cv.template  # voir fichier externe
-PROMPT = PromptTemplate(template=template, input_variables=["context", "question"])
-chain = call_to_llm.create_chain(llm,  PROMPT)
+
+## Prepare chain with prompt template
+prompt_multi = prompt_multi_cv.prompt  # generic multi CV, see external file
+chain = call_to_llm.create_chain(llm,  prompt_multi)
 
 ######### Main loop #########
 

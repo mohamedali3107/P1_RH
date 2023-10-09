@@ -1,3 +1,5 @@
+from langchain.prompts import PromptTemplate
+
 template = """You will be provided with chunks from several Curriculum Vitae of candidates in
     between triple backsticks.
     Your task is to help a recruiter get the information they need from the provided CVs,
@@ -39,3 +41,5 @@ The actual chunks of CV you should be exclusively considering for information ar
 
 ** <question of the recruiter>: {question}
 ** <answer>:"""
+
+prompt = PromptTemplate(template=template, input_variables=["context", "question"])
