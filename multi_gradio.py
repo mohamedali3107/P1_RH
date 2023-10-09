@@ -5,12 +5,14 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from langchain.chains.query_constructor.base import AttributeInfo
-from langchain.prompts import PromptTemplate
+import gradio as gr
+from itertools import chain as chain_list
 # my modules 
 import loading_preprocessing_multi
 import vectorstore_lib
 import prompt_multi_cv
 import call_to_llm
+import gradio_lib
 
 import os
 import openai
@@ -63,8 +65,7 @@ vectordb, list_of_names_as_str = vectorstore_lib.create_vector_db(docs,
                                                                   splitter, 
                                                                   embedding, 
                                                                   persist_directory,
-                                                                  enrich_with_name=True,
-                                                                  llm=llm, # for enriching
+                                                                  enrich_with_name=False
                                                                   )
 ## Filter infrastructure with self query retriever
 metadata_field_info = [
@@ -93,17 +94,19 @@ retriever_with_filter = SelfQueryRetriever.from_llm(
 retriever_obj = retriever_with_filter
 
 ## Prepare chain with prompt template
-prompt_multi = prompt_multi_cv.prompt  # generic multi CV, see external file
-chain = call_to_llm.create_chain(llm,  prompt_multi)
+prompt = prompt_multi_cv.prompt  # generic multi CV, see external file
 
-######### Main loop #########
+def fn_gradio_QA(question, with_source, print_prompt) :
+    '''Assumes : retriever_obj, prompt, llm (kinda dirty)'''
+    chain = call_to_llm.create_chain(llm, prompt)
+    chunks = vectorstore_lib.retrieving(retriever_obj, question, retriever_type=retriever_type, with_scores=False)
+    answer = call_to_llm.get_result(chain, chunks, question, print_source_docs=False, print_scores=False)
+    return gradio_lib.format_for_gradio(prompt, question, answer, with_source=with_source, print_prompt=print_prompt, chunks=chunks)
 
-if __name__ == '__main__':
-    while True :
-        inpt = input("\nEnter your question or type quit :\n")
-        if inpt == "quit" :
-            break
-        print('\n')
-        sources = vectorstore_lib.retrieving(retriever_obj, inpt, retriever_type=retriever_type, with_scores=with_scores)
-        print(call_to_llm.get_result(chain, sources, inpt, print_source_docs=True, print_scores=print_scores))
+demoGradioQA_MultipleCV = gr.Interface(
+    fn = fn_gradio_QA,
+    inputs = [gr.Textbox(label = 'Question', placeholder = 'Type your question here...'), gr.Checkbox(label = 'Print source'), gr.Checkbox(label = 'Print exact prompt fed to the LLM')],
+    outputs = [gr.Textbox(label = 'Answer')] + list(chain_list.from_iterable((gr.Textbox(label = f'Chunk #{i+1}'), gr.Textbox(label = f'Metadata #{i+1}')) for i in range(nb_chunks))) + [gr.Textbox(label = 'Exact prompt')]
+)
 
+demoGradioQA_MultipleCV.launch(inbrowser=True)
