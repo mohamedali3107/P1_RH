@@ -39,3 +39,30 @@ def load_files_all_at_once(data_dir, persist_directory) :
     else :
         docs = []
     return docs
+
+def load_field_value_from_csv(file, field) :
+    '''Output : a tuple as of now -- could be a document too'''
+    return 'field value', 'meta' 
+
+def get_value_and_meta(field_value_with_meta) :
+    '''Encapsulate the extraction of value and metadata from loaded data
+    so the rest is non assuming of chosen type.
+    Output : tuple'''
+    return field_value_with_meta[0], field_value_with_meta[1]
+
+def update_dict_with_field_value(dict_db, field, value_with_meta) :
+    '''Add a value from a structured CV to the corresponding field of the dictionary
+    Ideally value_with_meta should contain a value and a metadata'''
+    value, meta = get_value_and_meta(value_with_meta)
+    if field not in dict_db :
+        dict_db[field] = {meta : value}
+    else :
+        if meta not in dict_db[field] :
+            dict_db[field][meta] = value
+
+def create_context_from_dict(dict_db, field) :
+    '''Just in case (typically for non quantitative questions)'''
+    context = field + ' of candidates : \n\n'
+    for meta in dict_db[field] :
+        context += '  <' + meta + '>:  ' + dict_db[field][meta] + '\n\n'
+    return context

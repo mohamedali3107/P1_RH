@@ -67,3 +67,12 @@ def print_multi_result(inputs, results, print_context=False) :
                 print("    source : ", inputs[i]['context'])
     else :
         print(results['text'])
+
+######## On structured CVs #########
+
+def create_context_from_dict(dict_db, field) :
+    '''Just in case (typically for non quantitative questions)'''
+    context = field + ' of candidates : \n\n'
+    for meta in dict_db[field] :
+        context += '  <' + meta + '>:  ' + dict_db[field][meta] + '\n\n'
+    return context
