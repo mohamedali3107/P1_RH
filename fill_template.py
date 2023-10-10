@@ -116,7 +116,7 @@ def fill_one_row(template_path, file, save=False, verbose=False):
     
     if file in template_df["Filename"].unique():
         print("This CV has already been parsed")
-        return template_df.loc[template_df["Filename"] == "data/CV_robert_vesoul.pdf"].values.tolist()[0]
+        return template_df.loc[template_df["Filename"] == file].values.tolist()[0]
     
     else:
 
@@ -179,9 +179,7 @@ demo = gr.Interface(
     description = "Analyzes a file according to the given template"
 )
 
-#demo.launch(inbrowser=True)
+demo.launch(inbrowser=True)
 
-# print(complete_paths)
-# file = complete_paths[5]
-# print(fill_one_row(template_path, file, save=True))
-print(fill_whole_template(template_path, complete_paths))
+#print(fill_one_row(template_path, file, save=True))
+#print(fill_whole_template(template_path, complete_paths))
