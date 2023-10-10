@@ -55,7 +55,32 @@ Keep the answer as concise as possible.
 Always say "thanks for asking!" at the end of the answer.
 {context}
 """
+## template for retrieving the last position of the candidate
 
+prompt_template= """ You are an AI assistant who loves to help people!
+
+The texts provided to you are the resumes of the candidates.
+
+Your task is to provide the details about the most recent position of the candidate in the given context
+
+Your answer maybe the job title of the candidate, company/organization name, dates of employment
+
+Take your time to read carefully the pieces in the context to provide the request field.
+
+Do not provide answer out of the context pieces.
+
+If you don't know the answer, just say that you don't know, don't try to make up an answer.
+
+Always say "thanks for asking!" at the end of the answer.
+
+{context}
+
+Question: {query}
+
+Answer the question in the language of the question
+
+Helpful Answer:
+"""
 # Generic prompt
 prompt_generic = """You will be provided with a Curriculum Vitae delimited by triple backsticks.
 Your task is to find and provide the {field} of the person in this CV.
