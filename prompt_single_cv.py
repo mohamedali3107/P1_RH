@@ -1,3 +1,4 @@
+from langchain.prompts import PromptTemplate
 
 template = """
 Your task is to help a recruiter get the information they need from the provided CV of a candidate.
@@ -43,6 +44,8 @@ Universit´ e Paris-Sud, Orsay ```
 <question of the recruiter>: {question}
 """
 
+prompt_generic = PromptTemplate(template=template, input_variables=["context", "question"])
+
 template_concise = """
 Your task is to help a recruiter get the information they need from the provided CV of a candidate.
 The CV will be delimited by triple backsticks.
@@ -82,3 +85,5 @@ Universit´ e Paris-Sud, Orsay ```
 <question of the recruiter> : {question}
 
 <answer> :"""
+
+prompt_concise = PromptTemplate(template=template, input_variables=["context", "question"])
