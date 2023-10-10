@@ -23,65 +23,6 @@ complete_paths = [cv_path+file for file in os.listdir(cv_path) if 'pdf' in file]
 
 ## Choice of the prompt template to feed the LLM
 
-# Prompt asking to fill directly a template
-prompt_global = """ The texts provided to you are the resumes of the candidates.
-Your task is to answer the user question in a structured way as in the following format.
-
-<Desired format>
-
-Please extract the first name in the resume
-First name:
-Please extract the last name in the resume
-Last name:
-Please extract the phone number in the resume
-Phone number:
-Please extract the email contact in the resume
-Email adress:
-Please extract the language skills mentioned in the resume
-Languages :
-Please extract the technical skills mentioned in the resume
-Technical skills:
-Please extract the last experience of the candidate
-Last experience:
-
-</Desired format>
-
-Take your time to read carrefuly the pieces in the context to answer the question.
-Do not provide answer out of the context pieces.
-If you don't know the answer, just say that you don't know, don't try to make up an answer.
-
-Keep the answer as concise as possible. 
-
-Always say "thanks for asking!" at the end of the answer.
-{context}
-"""
-
-## Propt for retrieving the last position of the candidate
-prompt_last_position = """ You are an AI assistant who loves to help people!
-
-The texts provided to you are the resumes of the candidates.
-
-Your task is to provide the details about the most recent position of the candidate in the given context
-
-Your answer maybe the job title of the candidate, company/organization name, dates of employment
-
-Take your time to read carefully the pieces in the context to provide the request field.
-
-Do not provide answer out of the context pieces.
-
-If you don't know the answer, just say that you don't know, don't try to make up an answer.
-
-Always say "thanks for asking!" at the end of the answer.
-
-{context}
-
-Question: {query}
-
-Answer the question in the language of the question
-
-Helpful Answer:
-"""
-
 # Generic prompt
 prompt_generic = """You will be provided with a Curriculum Vitae delimited by triple backsticks.
 Your task is to find and provide the {field} of the person in this CV.
@@ -93,7 +34,7 @@ Curriculum Vitae : ```{context}```
 """
 
 # Different prompt for each field
-#prompts_df = pd.read_csv("promptTemplatesConcise.csv")
+prompts_df = pd.read_csv("prompt_templates_concise.csv")
 
 ########## LLM Chain parameters ##########
 
@@ -136,9 +77,9 @@ def fill_one_row(template_path, file, save=False, verbose=False):
 
             ## Prepare chain with prompt template
 
-            # prompt_template = prompts_df[field][0]
-            # prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
-            prompt = PromptTemplate(template=prompt_generic, input_variables=["context","field"])
+            prompt_template = prompts_df[field][0]
+            prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
+            # prompt = PromptTemplate(template=prompt_generic, input_variables=["context","field"])
             chain = call_to_llm.create_chain(llm, prompt)
 
             ## Retrieving and calling the LLM
@@ -167,7 +108,7 @@ def fill_whole_template(template_path, complete_paths):
     return time.time()-t0
 
 demo = gr.Interface(
-    fn = lambda file: fill_one_row(template_path, file),
+    fn = lambda file: fill_one_row(template_path, file, verbose=True),
     inputs =
     [
         gr.Dropdown(
