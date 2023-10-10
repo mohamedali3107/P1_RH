@@ -55,9 +55,9 @@ Keep the answer as concise as possible.
 Always say "thanks for asking!" at the end of the answer.
 {context}
 """
-## template for retrieving the last position of the candidate
 
-prompt_template= """ You are an AI assistant who loves to help people!
+## Propt for retrieving the last position of the candidate
+prompt_last_position = """ You are an AI assistant who loves to help people!
 
 The texts provided to you are the resumes of the candidates.
 
@@ -81,6 +81,7 @@ Answer the question in the language of the question
 
 Helpful Answer:
 """
+
 # Generic prompt
 prompt_generic = """You will be provided with a Curriculum Vitae delimited by triple backsticks.
 Your task is to find and provide the {field} of the person in this CV.
