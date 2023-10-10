@@ -105,7 +105,6 @@ splitter = RecursiveCharacterTextSplitter(
     separators=["\n\n", "\n", " ", ""]
 )
 embedding = OpenAIEmbeddings()
-nb_chunks = 4 
 llm_name = 'gpt-3.5-turbo'
 llm = ChatOpenAI(model_name=llm_name, temperature=0)
 
@@ -143,7 +142,10 @@ def fill_one_row(template_path, file, save=False, verbose=False):
             chain = call_to_llm.create_chain(llm, prompt)
 
             ## Retrieving and calling the LLM
-            sources = vectordb.similarity_search(field, k=nb_chunks)
+            retriever_obj = vectordb
+            sources = vectorstore_lib.retrieving(retriever_obj, field, retriever_type="vectordb", with_scores=False)
+            # nb_chunks = 4
+            # sources = vectordb.similarity_search(field, k=nb_chunks)
             context = call_to_llm.create_context_from_retrieved_chunks(sources)
             answer = chain.predict(context=context, field=field)
             data.append(answer)
