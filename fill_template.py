@@ -21,20 +21,9 @@ template_path = "data_template_concise.csv"
 cv_path = "data/"
 complete_paths = [cv_path+file for file in os.listdir(cv_path) if 'pdf' in file]
 
-## Choice of the prompt template to feed the LLM
-
-# Generic prompt
-prompt_generic = """You will be provided with a Curriculum Vitae delimited by triple backsticks.
-Your task is to find and provide the {field} of the person in this CV.
-Your output should be only the {field}, do not make a sentence.
-Do not provide answer out of the context pieces. If you did not find it, you should output "Unknown".
-
-Curriculum Vitae : ```{context}```
-{field} of the person :
-"""
-
-# Different prompt for each field
+# Loading the prompt templates (different for each field)
 prompts_df = pd.read_csv("prompt_templates_concise.csv")
+
 
 ########## LLM Chain parameters ##########
 
@@ -52,51 +41,47 @@ llm = ChatOpenAI(model_name=llm_name, temperature=0)
 def fill_one_row(template_path, file, save=False, verbose=False):
 
     template_df = pd.read_csv(template_path)
-    fields = list(template_df) # Avoiding the index field
+    fields = list(template_df) 
     
     if file in template_df["Filename"].unique():
         print("This CV has already been parsed")
-        return template_df.loc[template_df["Filename"] == file].values.tolist()[0]
+        return template_df.loc[template_df["Filename"] == file].values.tolist()[0] # Returns the corresponding row
     
     else:
-
+        if verbose:
+            print("Filling the template for " + file + "...\n")
         loader = PyMuPDFLoader(file)
         cv = loader.load()
         data = [file] # First field is the filename
 
-        ## Vectorstore creation
-
+        ## Vectorstore and retriever creation
         subprocess.run('rm -rf ./chroma_single/', shell=True)
         chunks = vectorstore_lib.splitting_of_docs(cv, splitter)
         vectordb = vectorstore_lib.new_vectordb(chunks, 
                                 embedding, 
                                 persist_directory
-        )    
+        )
+        retriever_obj = vectordb
 
         for field in fields[1:]:    # Omitting the first field (=filename)
 
             ## Prepare chain with prompt template
-
             prompt_template = prompts_df[field][0]
             prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
-            # prompt = PromptTemplate(template=prompt_generic, input_variables=["context","field"])
             chain = call_to_llm.create_chain(llm, prompt)
 
             ## Retrieving and calling the LLM
-            retriever_obj = vectordb
             sources = vectorstore_lib.retrieving(retriever_obj, field, retriever_type="vectordb", with_scores=False)
-            # nb_chunks = 4
-            # sources = vectordb.similarity_search(field, k=nb_chunks)
             context = call_to_llm.create_context_from_retrieved_chunks(sources)
             answer = chain.predict(context=context, field=field)
             data.append(answer)
             if verbose:
                 print(data)
-        df = pd.DataFrame(columns=fields, data=[data])
+        new_row = pd.DataFrame(columns=fields, data=[data])
         if save:
-            result_df = pd.concat([template_df, df], ignore_index=True)
-            result_df.to_csv(template_path, index=False)
-        return list(df.iloc[0])
+            template_df = pd.concat([template_df, new_row], ignore_index=True)
+            template_df.to_csv(template_path, index=False)
+        return list(new_row.iloc[0])
 
 def fill_whole_template(template_path, complete_paths):
     t0 = time.time()
@@ -105,7 +90,7 @@ def fill_whole_template(template_path, complete_paths):
             fill_one_row(template_path, file, save=True, verbose=True)
         except:
             print("Error filling the template for " + file)
-    return time.time()-t0
+    return "Time to fill the template for all CVs: {:.2f}s".format(time.time()-t0)
 
 demo = gr.Interface(
     fn = lambda file: fill_one_row(template_path, file, verbose=True),
@@ -122,7 +107,6 @@ demo = gr.Interface(
     description = "Analyzes a file according to the given template"
 )
 
-demo.launch(inbrowser=True)
-
+#demo.launch(inbrowser=True)
 #print(fill_one_row(template_path, file, save=True))
 #print(fill_whole_template(template_path, complete_paths))
