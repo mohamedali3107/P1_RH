@@ -93,7 +93,7 @@ def fill_whole_template(template_path, complete_paths):
     return "Time to fill the template for all CVs: {:.2f}s".format(time.time()-t0)
 
 demo = gr.Interface(
-    fn = lambda file: fill_one_row(template_path, file, verbose=True),
+    fn = lambda file: fill_one_row(template_path, file, verbose=False),
     inputs =
     [
         gr.Dropdown(
@@ -107,7 +107,7 @@ demo = gr.Interface(
     description = "Analyzes a file according to the given template"
 )
 
-demo.launch(inbrowser=True)
+#demo.launch(inbrowser=True)
 # file = complete_paths[0]
 # print(fill_one_row(template_path, file, verbose=True))
-#print(fill_whole_template(template_path, complete_paths))
+print(fill_whole_template(template_path, complete_paths))

@@ -154,6 +154,7 @@ Curriculum Vitae : ```{context}```
 """ You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
 Your task is to provide to extract the City of Residence of the candidate.
 Take your time to read carefully the pieces in the context to retrieve the requested field.
+Your output should be only one City. Do not make a sentence.
 Do not provide answer out of the context pieces.
 If you don't know the answer, you should output "Unknown".
 
@@ -210,18 +211,29 @@ Basic
 Curriculum Vitae : ```{context}```
 """,
 """ You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide a comprehensive list of the technical skills of the candidate.
+Your task is to provide a comprehensive list of the technical skills of the candidate. Do not specify the technologies, frameworks and programming languages used.
 Take your time to read carefully the pieces in the context to provide the request field.
 Do not provide answer out of the context pieces.
 If you don't know the answer, you should output "Unknown".
 
+<EXAMPLES OF OUTPUTS>
+- Coding, Data Science, Optimization, Signal Processing.
+- Mathematics, programming, teaching.
+</EXAMPLES OF OUTPUTS>
+
 Curriculum Vitae : ```{context}```
 """,
 """ You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide a comprehensive list of the programming skills of the candidate.
+Your task is to provide a comprehensive list of the candidate's programming skills that are in high demand in the software development industry. 
+You may include languages, frameworks, libraries, and technologies.
 Take your time to read carefully the pieces in the context to provide the request field.
 Do not provide answer out of the context pieces.
 If you don't know the answer, you should output "Unknown".
+
+<EXAMPLES OF OUTPUTS>
+- Python, Java, C++, Matlab
+- Julia, Matlab, SQL, MongoDB.
+</EXAMPLES OF OUTPUTS>
 
 Curriculum Vitae : ```{context}```
 """,
@@ -243,7 +255,7 @@ Curriculum Vitae : ```{context}```
 """,
 """  You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
 Your task is to provide the most current work position of the candidate in the given context.
-Your answer may be the job title of the candidate, company or organization name, dates of employment.
+Your answer should include, if you can find it, the job title of the candidate, company or organization name and dates of employment.
 Your output should be only the current work position of the candidate, do not make a sentence.
 Take your time to read carefully the pieces in the context to provide the request field.
 Do not provide answer out of the context pieces.
@@ -251,10 +263,9 @@ If you don't know the answer, you should output "Unknown".
 
 Curriculum Vitae : ```{context}```
 """,
-
 """  You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
 Your task is to provide the previous work position of the candidate in the given context.
-Your answer may be the job title of the candidate, company or organization name, dates of employment.
+Your answer should include, if you can find it, the job title of the candidate, company or organization name and dates of employment.
 Your output should be only the previous work position of the candidate, do not make a sentence.
 Take your time to read carefully the pieces in the context to provide the request field.
 Do not provide answer out of the context pieces.
@@ -262,24 +273,54 @@ If you don't know the answer, you should output "Unknown".
 
 Curriculum Vitae : ```{context}```
 """,
-"""  You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide the details about the professional experience of the candidate in the given context.
-Your answer maybe the job title of the candidate, company/organization name, dates of employment.
-Take your time to read carefully the pieces in the context to provide the request field.
-Do not provide answer out of the context pieces.
-If you don't know the answer, you should output "Unknown".
+""" You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the professional experience of the person in this CV.
+Your output should be only the professional experience, do not make a sentence.
+Do not provide answer out of the context pieces. If you did not find it, you should output "Unknown".
 
 Curriculum Vitae : ```{context}```
-""",
-"""  You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide the details about the education of the candidate in the given context.
-Take your time to read carefully the pieces in the context to provide the request field.
-Do not provide answer out of the context pieces.
-If you don't know the answer, you should output "Unknown".
+Professional experience of the person :
+"""
+,
+""" You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the education of the person in this CV.
+Your output should be only the education, do not make a sentence.
+Do not provide answer out of the context pieces. If you did not find it, you should output "Unknown".
 
 Curriculum Vitae : ```{context}```
+Education of the person :
 """]
 ]
+
+# """Your task is to help a recruiter get the information they need from the provided CV of a candidate.
+# The CV will be delimited by triple backsticks.
+# All the information from the CV is about one individual who is the candidate.
+
+# <FORMAT>
+# - Job title 1 | Company or Organisation name 1 | Start date 1 - End date 1
+# - Job title 2 | Company or Organisation name 2 | Start date 2 - End date 2
+# - Job title 3 | Company or Organisation name 3 | Start date 3 - End date 3
+# </FORMAT>
+# If no end date is specified, remplace the end date by 'today'.
+
+# Do not provide answer out of the context pieces.
+# After giving a first answer, try scanning again the document to see if you can find other pieces of relevant information that you did not include in your first answer. 
+# Then, only if you found additional relevant pieces of information, provide a more complete answer.
+# If you don't know the answer, you should output "Unknown".
+
+# <EXAMPLE 1>
+# - Co-Fondateur et Président | Mistral AI | Septembre 2010 - Aujourd'hui
+# - Directeur Général Adjoint, en charge de la Branche Intérim | Manpower | Janvier 1999 - Juin 2010
+# - Directeur RH | Manpower | Janvier 1997 - Janvier 1999
+# </EXAMPLE 1>
+
+# <EXAMPLE 2>
+# - Data Scientist | Total | Juin 2021 - Today
+# - Software developer | Thalès | Mars 2014 - Avril 2021
+# </EXAMPLE 2>
+
+# <CV> : ```{context}```
+# """
 
 prompts_df_concise = pd.DataFrame(data=prompts_concise_v1, columns=fields)
 prompts_df_concise.to_csv("prompt_templates_concise.csv", index=False)
