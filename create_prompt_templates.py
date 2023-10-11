@@ -89,6 +89,15 @@ Male
  
 If the first name is Mary:
 Female
+ 
+ If the first name is Jeanne:
+Female
+ 
+ If the first name is Frédéric:
+Male
+ 
+ If the first name is Julia:
+Female
  </EXAMPLES>
 
 Curriculum Vitae : ```{context}```
@@ -166,6 +175,13 @@ Take your time to read carefully the pieces in the context to provide the reques
 Do not provide answer out of the context pieces and do not make a reasoning.
 If you don't know the answer, you should output "Unknown".
 
+<EXAMPLES>
+Native
+Fluent 
+Intermediate
+Basic
+</EXAMPLES>
+
 Curriculum Vitae : ```{context}```
 """,
 """ You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
@@ -184,10 +200,17 @@ Take your time to read carefully the pieces in the context to provide the reques
 Do not provide answer out of the context pieces and do not make a reasoning.
 If you don't know the answer, you should output "Unknown".
 
+<EXAMPLES>
+Native
+Fluent 
+Intermediate
+Basic
+</EXAMPLES>
+
 Curriculum Vitae : ```{context}```
 """,
 """ You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide a comprehensive list of the technical skills of the candidate, along with a brief description for each in the given context.
+Your task is to provide a comprehensive list of the technical skills of the candidate.
 Take your time to read carefully the pieces in the context to provide the request field.
 Do not provide answer out of the context pieces.
 If you don't know the answer, you should output "Unknown".
@@ -195,7 +218,7 @@ If you don't know the answer, you should output "Unknown".
 Curriculum Vitae : ```{context}```
 """,
 """ You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide a comprehensive list of the programming skills of the candidate, along with a brief description for each in the given context.
+Your task is to provide a comprehensive list of the programming skills of the candidate.
 Take your time to read carefully the pieces in the context to provide the request field.
 Do not provide answer out of the context pieces.
 If you don't know the answer, you should output "Unknown".
@@ -204,15 +227,24 @@ Curriculum Vitae : ```{context}```
 """,
 """  You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
 Your task is to provide the highest degree of the candidate in the given context.
+Your output should be only the highest degree title of the candidate, do not make a sentence. Do not mention the institution. 
 Take your time to read carefully the pieces in the context to provide the request field.
 Do not provide answer out of the context pieces.
 If you don't know the answer, you should output "Unknown".
+
+<EXAMPLES>
+PhD
+Msc
+Master of Engineering
+Bachelor
+</EXAMPLES>
 
 Curriculum Vitae : ```{context}```
 """,
 """  You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
 Your task is to provide the most current work position of the candidate in the given context.
 Your answer may be the job title of the candidate, company or organization name, dates of employment.
+Your output should be only the current work position of the candidate, do not make a sentence.
 Take your time to read carefully the pieces in the context to provide the request field.
 Do not provide answer out of the context pieces.
 If you don't know the answer, you should output "Unknown".
@@ -223,6 +255,7 @@ Curriculum Vitae : ```{context}```
 """  You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
 Your task is to provide the previous work position of the candidate in the given context.
 Your answer may be the job title of the candidate, company or organization name, dates of employment.
+Your output should be only the previous work position of the candidate, do not make a sentence.
 Take your time to read carefully the pieces in the context to provide the request field.
 Do not provide answer out of the context pieces.
 If you don't know the answer, you should output "Unknown".

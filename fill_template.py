@@ -107,7 +107,7 @@ demo = gr.Interface(
     description = "Analyzes a file according to the given template"
 )
 
-#demo.launch(inbrowser=True)
-file = complete_paths[0]
-print(fill_one_row(template_path, file, verbose=True))
+demo.launch(inbrowser=True)
+# file = complete_paths[0]
+# print(fill_one_row(template_path, file, verbose=True))
 #print(fill_whole_template(template_path, complete_paths))
