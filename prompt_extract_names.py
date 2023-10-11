@@ -68,3 +68,14 @@ Curriculum Vitae : ```{context}```
 Name of the person :"""
 
 prompt_name_in_text = PromptTemplate(template=template_name_in_text, input_variables=["context"])
+
+template_name_in_query = """
+You will be provided with a query about a person that will be delimited by triple backsticks.
+Your task is to find and provide the full name of the person from this query.
+Your output should be only the name, do not make a sentence.
+If you did not find it, you should output "Unknown".
+
+Query : ```{context}```
+Name of the person :"""
+
+prompt_name_in_query = PromptTemplate(template=template_name_in_query, input_variables=["context"])
