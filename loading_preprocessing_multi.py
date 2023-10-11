@@ -48,7 +48,7 @@ def list_of_fields_csv(csv_file) :
 
 def labels_from_csv(csv_file) :
     # to implement
-    return ['cv1.pdf', 'cv2.pdf']
+    return ['cv1.pdf', 'cv2.pdf', 'cv3.pdf', 'cv4.pdf', 'cv5.pdf', 'cv6.pdf']
 
 def meta_of_file_from_csv(csv_file, label) :
     '''Output metadata to be used as key in dict_db'''
@@ -56,7 +56,10 @@ def meta_of_file_from_csv(csv_file, label) :
     field_first_name, field_family_name = fields[1], fields[2]
     first_name= load_field_data_from_csv(csv_file, label, field_first_name)
     family_name = load_field_data_from_csv(csv_file, label, field_family_name)
-    return first_name + ' ' + family_name
+    return first_name + ' ' + label
+
+def update_pool_loaded_CV(all_loaded_CV, label, meta) :  # todo : meta ou label ?
+    all_loaded_CV[label] = meta  # maybe pre-existant but ok
 
 def load_field_data_from_csv(csv_file, label, field) :
     '''Read a specified value in a csv'''
@@ -69,8 +72,7 @@ def update_dict_with_field_value(dict_db, field, value, meta) :  # keep tests ?
     if field not in dict_db :
         dict_db[field] = {meta : value}
     else :
-        if meta not in dict_db[field] :  # todo : test pas si utile, au pire on écrase avec la même valeur
-            dict_db[field][meta] = value
+        dict_db[field][meta] = value
 
 def update_dict_with_field_from_csv(dict_db, csv_file, field, all_loaded_CV) :
     labels = labels_from_csv(csv_file)
@@ -82,6 +84,7 @@ def update_dict_with_field_from_csv(dict_db, csv_file, field, all_loaded_CV) :
             all_loaded_CV[label] = meta
         value = load_field_data_from_csv(csv_file, label, field)
         update_dict_with_field_value(dict_db, field, value, meta)
+        update_pool_loaded_CV(all_loaded_CV, label, meta)
 
 ## il est possible que des cv qui apparaissent dans
 ## all_loaded_cv et qq part dans dict_db n'aient pas tous les mêmes champs
@@ -97,7 +100,7 @@ def equalize_loaded_data(dict_db, all_loaded_CV, csv_file) :
                 value = load_field_data_from_csv(csv_file, label, field)
                 update_dict_with_field_value(dict_db, field, value, meta) # redundant test...
 
-def update_dict_with_CV(dict_db, label, csv_file, full=False) :
+def update_dict_with_CV(dict_db, label, csv_file, all_loaded_CV, full=False) :
     '''If new CV added to the pool (csv file was updated)
     Update of already loaded fields with values from new CV
     If full, addition and/or update of all csv fields into dict'''
@@ -105,27 +108,28 @@ def update_dict_with_CV(dict_db, label, csv_file, full=False) :
     if not full :
         for field in dict_db :
             data = load_field_data_from_csv(csv_file, meta, field)
-            update_dict_with_field_value(dict_db, field, data)
+            update_dict_with_field_value(dict_db, field, data, meta)
     else :
         list_of_fields = list_of_fields_csv(csv_file)
         for field in list_of_fields :
             data = load_field_data_from_csv(csv_file, meta, field)
-            update_dict_with_field_value(dict_db, field, data)
+            update_dict_with_field_value(dict_db, field, data, meta)
+    update_pool_loaded_CV(all_loaded_CV, label, meta)
 
-def update_pool_loaded_CV(all_loaded_CV, label, meta) :  # todo : meta ou label ?
-    all_loaded_CV[label] = meta
-
-def update_dict_from_csv(dict_db, csv_file, list_loaded_CV) :
-    '''Update with several new CVs'''
+def update_dict_from_csv(dict_db, csv_file, all_loaded_CV, full=False) :
+    '''Update with several new CVs (all fields if full, else only already loaded ones)'''
     labels = labels_from_csv(csv_file)
     for label in labels :
-        if label not in list_loaded_CV :
-            update_dict_with_CV(dict_db, label, csv_file)
+        if label not in all_loaded_CV :
+            update_dict_with_CV(dict_db, label, csv_file, full=full)
             update_pool_loaded_CV(label)
+    equalize_loaded_data(dict_db, all_loaded_CV, csv_file)
 
 def load_full_csv_to_dict(csv_file, dict_db, all_loaded_CV) :
     labels = labels_from_csv(csv_file)
     for label in labels :
-        update_dict_with_CV(dict_db, label, csv_file, full=True)
+        update_dict_with_CV(dict_db, label, csv_file, all_loaded_CV, full=True)
         meta = meta_of_file_from_csv(csv_file, label)
         update_pool_loaded_CV(all_loaded_CV, label, meta)
+
+# todo : prendre en charge la suppression de cv/data
