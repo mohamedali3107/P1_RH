@@ -16,6 +16,7 @@ def extract_target_field(query, list_of_fields, llm='default') :
     '''Determine what field is targeted by a query, among a list of possible fields'''
     if llm == 'default' :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
+    print(query)
     chain_field = LLMChain(llm=llm, prompt=prompt_interrogate_field.prompt_extract_field)
     fields = ", ".join(list_of_fields)
     return chain_field.predict(topics=fields, question=query)
@@ -23,11 +24,11 @@ def extract_target_field(query, list_of_fields, llm='default') :
 def detect_query_type(question, llm='default') :
     if llm == 'default' :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
-    llm_chain = LLMChain(prompt=prompt_detect_mode.prompt, llm=llm)
+    llm_chain = LLMChain(prompt=prompt_detect_mode.prompt_english, llm=llm)
     answer = llm_chain.predict(question=question)
     # todo : Mettre une petite exception mieux que ça 
     if answer not in ["single", "transverse", "unknown"] :
-         print("Question : " + question + "\nRéponse de detect_query_type :", answer)
+         print("Question : " + question + "\nAnswer of detect_query_type :", answer)
          return "Error"
     else:
         return answer

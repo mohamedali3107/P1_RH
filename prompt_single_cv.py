@@ -76,14 +76,12 @@ ATER en Informatique 2019-2021
 Universit´ e Paris-Sud, Orsay ```
 
 <question of the recruiter> : Where did they study ?
-
 <answer> : Université de Lille, Université Paris-Sud, Université Paris-Saclay, Lycée la Martinière
 
 
 <CV> : ```{context}```
 
 <question of the recruiter> : {question}
-
 <answer> :"""
 
-prompt_concise = PromptTemplate(template=template, input_variables=["context", "question"])
+prompt_concise = PromptTemplate(template=template_concise, input_variables=["context", "question"])

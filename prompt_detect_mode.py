@@ -38,7 +38,48 @@ template = """L'input que tu reçois est une question d'un recruteur RH portant 
 
     Question : {question}"""
 
-prompt = PromptTemplate(template=template, input_variables=["question"])
+prompt_french = PromptTemplate(template=template, input_variables=["question"])
+
+template = """You will be provided with a question delimited by triple backsticks.
+The question is asked by a recruiter about some candidates for a job and their CV.
+Your task is to determine what kind of question that is.
+
+    < Possible outputs>
+    - single (if the question asked involves only one candidate) ;
+    - transverse (if the question involves several candidates/CV) ;
+    - unknown (if you cannot predict for sure).
+    </Possible outputs>
+    
+    <EXEMPLES>
+    Question : "What is the e-mail of Julie Delon ?"
+    single
+
+    Question : "List the e-mail addresses of candidates"
+    transverse
+
+    Question : "What candidates work at Illuin Technology ?"
+    transverse
+
+    Question : "Who is the most skilled ?"
+    transverse
+
+    Question : "What position did Jean Durand last occupy ?"
+    single
+
+    Question : "What are the experiences of Jacques Lafitte ?"
+    single
+
+    Question : "List the experiences of the first candidate"
+    single
+
+    Question : "Who is the most fitted candidate for the a Data Scientist job ?"
+    transverse
+    </EXEMPLES>
+
+    Question : ```{question}```
+    """
+
+prompt_english = PromptTemplate(template=template, input_variables=["question"])
 
 template_predict_operation = """You will be provided with a question delimited by triple backsticks.
 Your task is to determine what kind of operation the question involves, among a list of possible operations.

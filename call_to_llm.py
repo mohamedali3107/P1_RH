@@ -1,4 +1,6 @@
 from langchain.chains import LLMChain
+import treat_query
+import manage_transversal_query
 
 def create_context_from_chunks(docs) :
     '''Concatenate the content of retrieved documents as a context to be fed to the llm
@@ -76,3 +78,36 @@ def create_context_from_dict(dict_db, field) :
     for meta in dict_db[field] :
         context += '  <' + meta + '>:  ' + dict_db[field][meta] + '\n\n'
     return context
+
+def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', llm='default') :
+    field = treat_query.extract_target_field(query_multi, list_of_fields, llm=llm)
+    print('detected field :', field)
+    operation = treat_query.detect_operation_from_query(query_multi, llm=llm)
+    if operation == 'Condition' :
+        mono_query = treat_query.multi_to_mono(query_multi)
+        print('mono query :', mono_query)
+        outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, field, chain=chain, llm=llm)
+        selected_candidates = []
+        for meta in outputs :
+            if outputs[meta] == 'Yes' :
+                selected_candidates.append(meta)
+        if selected_candidates == [] :
+            print('No candidates seem to meet the condition.')
+        return ", ".join(selected_candidates)
+    else :
+        print('Type of tranversal question not supported yet')
+        return ''
+
+def ask_question_dict(dict_db, question, list_of_fields, chain='default', llm='default') :
+    mode = treat_query.detect_query_type(question, llm=llm)
+    if mode == 'transverse' :
+        return ask_question_multi(dict_db, question, list_of_fields, chain=chain, llm=llm)
+    elif mode == 'single' :
+        print('Not implemented yet')
+    else :
+        print('Mode transverse/single unclear')
+    return ''
+    
+
+def query_apply_condition(dict_db, question, field) :
+    return

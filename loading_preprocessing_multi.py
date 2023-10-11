@@ -48,7 +48,7 @@ def list_of_fields_csv(csv_file) :
 
 def labels_from_csv(csv_file) :
     # to implement
-    return ['cv1.pdf', 'cv2.pdf', 'cv3.pdf', 'cv4.pdf', 'cv5.pdf', 'cv6.pdf']
+    return ['cv1', 'cat2', 'cv3', 'cat4', 'cv5', 'cv6']
 
 def meta_of_file_from_csv(csv_file, label) :
     '''Output metadata to be used as key in dict_db'''
@@ -56,7 +56,7 @@ def meta_of_file_from_csv(csv_file, label) :
     field_first_name, field_family_name = fields[1], fields[2]
     first_name= load_field_data_from_csv(csv_file, label, field_first_name)
     family_name = load_field_data_from_csv(csv_file, label, field_family_name)
-    return first_name + ' ' + label
+    return 'name' + ' ' + label  # output temporaire pour tests
 
 def update_pool_loaded_CV(all_loaded_CV, label, meta) :  # todo : meta ou label ?
     all_loaded_CV[label] = meta  # maybe pre-existant but ok
@@ -64,7 +64,7 @@ def update_pool_loaded_CV(all_loaded_CV, label, meta) :  # todo : meta ou label 
 def load_field_data_from_csv(csv_file, label, field) :
     '''Read a specified value in a csv'''
     # to implement
-    return 'value'
+    return field + label
 
 def update_dict_with_field_value(dict_db, field, value, meta) :  # keep tests ?
     '''Add a value from a structured CV to the corresponding field of the dictionary
@@ -112,7 +112,7 @@ def update_dict_with_CV(dict_db, label, csv_file, all_loaded_CV, full=False) :
     else :
         list_of_fields = list_of_fields_csv(csv_file)
         for field in list_of_fields :
-            data = load_field_data_from_csv(csv_file, meta, field)
+            data = load_field_data_from_csv(csv_file, label, field)
             update_dict_with_field_value(dict_db, field, data, meta)
     update_pool_loaded_CV(all_loaded_CV, label, meta)
 
