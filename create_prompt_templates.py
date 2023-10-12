@@ -180,12 +180,11 @@ Do not provide answer out of the Curriculum Vitae.
 If you don't know the answer, you should output "Unknown".
 
 <EXAMPLE 1>
-- Coding, Data Science, Optimization, Signal Processing.
-- Mathematics, programming, teaching.
+Coding, Data Science, Optimization, Signal Processing.
 </EXAMPLE 1>
 
 <EXAMPLE 2>
-- Mathematics, programming, teaching.
+Mathematics, programming, teaching.
 </EXAMPLE 2>
 
 Curriculum Vitae : ```{context}```
@@ -198,12 +197,11 @@ Do not provide answer out of the Curriculum Vitae.
 If you don't know the answer, you should output "Unknown".
 
 <EXAMPLE 1>
-- Python, Java, C++, Matlab
-- Julia, Matlab, SQL, MongoDB.
+Python, Java, C++, Matlab
 </EXAMPLE 1>
 
 <EXAMPLE 2>
-- Julia, Matlab, SQL, MongoDB.
+Julia, Matlab, SQL, MongoDB.
 </EXAMPLE 2>
 
 Curriculum Vitae : ```{context}```
@@ -228,18 +226,18 @@ Your task is to find and provide the most current work position of the person in
 Your answer should include, if you can find it, dates of employment, the company or organisation name and the job or position title. 
 Try to give the most current work position in the following format:
 <FORMAT>
-- Job or Position title | Company or Organisation name | Start date - End date
+Job or Position title | Company or Organisation name | Start date - End date
 </FORMAT>
 Do not make a sentence.
 Do not provide answer out of the Curriculum Vitae.
 If you don't know the answer, you should output "Unknown".
 
 <EXAMPLE 1>
-- Directeur Général Adjoint, en charge de la Branche Intérim | Manpower | Janvier 1999 - Juin 2010
+Directeur Général Adjoint, en charge de la Branche Intérim | Manpower | Janvier 1999 - Juin 2010
 </EXAMPLE 1>
 
 <EXAMPLE 2>
-- Software developer intern | Thalès | Mars 2014 - Avril 2021
+Software developer intern | Thalès | Mars 2014 - Avril 2021
 </EXAMPLE 2>
 
 Curriculum Vitae : ```{context}```
@@ -249,18 +247,18 @@ Your task is to find and provide the previous work position of the person in the
 Your answer should include, if you can find it, dates of employment, the company or organisation name and the job or position title. 
 Try to give the most previous work position in the following format:
 <FORMAT>
-- Job or Position title | Company or Organisation name | Start date - End date
+Job or Position title | Company or Organisation name | Start date - End date
 </FORMAT>
 Do not make a sentence.
 Do not provide answer out of the Curriculum Vitae.
 If you don't know the answer, you should output "Unknown".
 
 <EXAMPLE 1>
-- Directeur Général Adjoint, en charge de la Branche Intérim | Manpower | Janvier 1999 - Juin 2010
+Directeur Général Adjoint, en charge de la Branche Intérim | Manpower | Janvier 1999 - Juin 2010
 </EXAMPLE 1>
 
 <EXAMPLE 2>
-- Software developer intern | Thalès | Mars 2020 - Avril 2021
+Software developer intern | Thalès | Mars 2020 - Avril 2021
 </EXAMPLE 2>
 
 Curriculum Vitae : ```{context}```
