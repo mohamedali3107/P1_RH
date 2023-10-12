@@ -85,7 +85,6 @@ def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', ll
     operation = treat_query.detect_operation_from_query(query_multi, llm=llm)
     if operation == 'Condition' :
         mono_query = treat_query.multi_to_mono(query_multi)
-        print('mono query :', mono_query)
         outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, field, chain=chain, llm=llm)
         selected_candidates = []
         for meta in outputs :
@@ -94,6 +93,13 @@ def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', ll
         if selected_candidates == [] :
             print('No candidates seem to meet the condition.')
         return ", ".join(selected_candidates)
+    elif operation == 'All' :
+        mono_query = treat_query.multi_to_mono(query_multi)
+        outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, field, chain=chain, llm=llm)
+        global_output = ""
+        for meta in outputs :
+            global_output += meta + ' : ' + outputs[meta]
+        return global_output
     else :
         print('Type of tranversal question not supported yet')
         return ''

@@ -8,7 +8,7 @@ among a list of possible topics, in between triple backsticks.
 You should output only the identified topic, do not make a sentence.
 
 <EXAMPLE>
-Mock possible topics : < age, name, skills, languages, most recent diploma, hobbies >
+Mock possible topics : < age, first name, name, skills, languages, most recent diploma, hobbies >
 
 Question of the recruiter : How old is he ?
 Your output : age
