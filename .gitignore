@@ -4,3 +4,6 @@ test.py
 *.pdf
 *.zip
 __pycache__/*
+*.pyc
+*.bin
+*.sqlite3
