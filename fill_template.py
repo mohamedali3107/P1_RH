@@ -83,7 +83,7 @@ def fill_one_row(template_path, file, force_refill, save=False, verbose=False):
         if save:
             template_df = pd.concat([template_df, new_row], ignore_index=True)
             template_df.to_csv(template_path, index=False)
-        return list(new_row.iloc[0])
+        return data
 
 def fill_whole_template(template_path, complete_paths, print_time, force_refill=True):
     t0 = time.time()

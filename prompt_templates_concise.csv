@@ -1,9 +1,9 @@
 Filename,Gender,First Name,Last Name,Email,Phone Number,Personal Webpage,Country,City,Language 1,Level Language 1,Language 2, Language 2 Level,Technical skills,Programming skills,Highest Degree,Current Position,Previous Position,Professional Experience,Education
 ," You will be provided with a Curriculum Vitae delimited by triple backsticks.
-Your task is to provide the gender identity of the candidate in the given context
-You may specify the gender identity of the candidate by relying on the candidate's first name.
-Your output should be only the gender identity of the candidate, do not make a sentence.
-Do not provide answer out of the context pieces. If you did not find it, you should output ""Unknown"".
+Your task is to find and provide the gender identity of the person in this Curriculum Vitae.
+You may specify the gender identity of the person by relying on the person's first name.
+Your output should be only the gender identity of the person, do not make a sentence.
+Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output ""Unknown"".
  
  <EXAMPLES>
 If the first name is John:
@@ -23,71 +23,59 @@ Female
  </EXAMPLES>
 
 Curriculum Vitae : ```{context}```
-"," You are an AI assistant who loves to help people! Your are provided with the resumes of the candidates.
-Your task is to retrieve the candidate First Name mentioned in the resumes.
-Take your time to read carefully the pieces in the provided context to get the right answer.
-Do not provide answer out of the context pieces. Just provide the answer without making a sentence.
-If you don't know the answer, you should output ""Unknown"".
+"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the first name of the person in this Curriculum Vitae.
+Your output should be only the first name of the person, do not make a sentence.
+Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output ""Unknown"".
 
 Curriculum Vitae : ```{context}```
-"," You are an AI assistant who loves to help people! Your are provided with the resumes of the candidates.
-Your task is to retrieve the candidate Last Name mentioned in the resume.
-Take your time to read carefully the pieces in the provided context to get the right answer.
-Do not provide answer out of the context pieces. Just provide the answer without making a sentence.
-If you don't know the answer, you should output ""Unknown"".
+"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the last name of the person in this Curriculum Vitae.
+Your output should be only the last name of the person, do not make a sentence.
+Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output ""Unknown"".
 
 Curriculum Vitae : ```{context}```
-"," You are an AI assistant who loves to help people! Your are provided with the resumes of the candidates.
-Your task is to retrieve the candidate's email adress mentioned in the resume.
-Take your time to read carefully the pieces in the provided context to get the right answer.
-Do not provide answer out of the context pieces. Just provide the answer without making a sentence.
-If you don't know the answer, you should output ""Unknown"".
+"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the email address of the person in this Curriculum Vitae.
+Your output should be only the email address of the person, do not make a sentence.
+Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output ""Unknown"".
 
 Curriculum Vitae : ```{context}```
-"," You are an AI assistant who loves to help people! Your are provided with the resumes of the candidates.
-Your task is to retrieve the candidate Phone Number mentioned in the resume.
-Take your time to read carefully the pieces in the provided context to get the right answer.
-Do not provide answer out of the context pieces. Just provide the answer without making a sentence.
-If you don't know the answer, you should output ""Unknown"".
+"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the phone number of the person in this Curriculum Vitae.
+Your output should be only the phone number of the person, do not make a sentence.
+Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output ""Unknown"".
 
 
 Curriculum Vitae : ```{context}```
-"," You are an AI assistant who loves to help people! Your are provided with the resumes of the candidates.
-Your task is to retrieve the candidate's personal webpage URL mentioned in the resume.
-Take your time to read carefully the pieces in the provided context to get the right answer.
-Do not provide answer out of the context pieces. Just provide the answer without making a sentence.
-If you don't know the answer, you should output ""Unknown"".
+"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the personal webpage URL of the person in this Curriculum Vitae.
+Your output should be only the personal webpage URL of the person, do not make a sentence.
+Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output ""Unknown"".
 
 Curriculum Vitae : ```{context}```
-"," You are an AI assistant who loves to help people! The texts provided to you are the resume of the candidates.
-Your task is to retrieve the candidate's Country of Residence. Do not provide a reasoning.
-Your output should be only one Country. Do not make a sentence.
-Do not provide answer out of the context pieces.
-If you don't know the answer, you should output ""Unknown"".
+"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the country of residence of the person in this Curriculum Vitae.
+Your output should be only the country, do not make a sentence. Do not provide a reasoning.
+Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output ""Unknown"".
 
 Curriculum Vitae : ```{context}```
-"," You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide to extract the City of Residence of the candidate.
-Take your time to read carefully the pieces in the context to retrieve the requested field.
-Your output should be only one City. Do not make a sentence.
-Do not provide answer out of the context pieces.
-If you don't know the answer, you should output ""Unknown"".
+"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the city of residence of the person in this Curriculum Vitae.
+Your output should be only one city, do not make a sentence. Do not provide a reasoning.
+Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output ""Unknown"".
 
 Curriculum Vitae : ```{context}```
-"," You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide first language spoken by the candidate from the given context. 
-Your output should be only the language, do not make a sentence.
-Take your time to read carefully the pieces in the context to provide the request field.
-Do not provide answer out of the context pieces and do not make a reasoning.
-If you don't know the answer, you should output ""Unknown"".
+"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the first language spoken by the person in this Curriculum Vitae.
+Your output should be only one language, do not make a sentence.
+Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output ""Unknown"".
 
 Curriculum Vitae : ```{context}```
-"," You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide proficiency level of the first language spoken by the candidate from the given context.
+"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the proficiency level of the first language spoken by the person in this Curriculum Vitae.
 Your output should be only the proficiency level, do not make a sentence.
-Take your time to read carefully the pieces in the context to provide the request field.
-Do not provide answer out of the context pieces and do not make a reasoning.
-If you don't know the answer, you should output ""Unknown"".
+Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output ""Unknown"".
 
 <EXAMPLES>
 Native
@@ -97,20 +85,16 @@ Basic
 </EXAMPLES>
 
 Curriculum Vitae : ```{context}```
-"," You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide second language spoken by the candidate from the given context.
-Your output should be only the language, do not make a sentence.
-Take your time to read carefully the pieces in the context to provide the request field.
-Do not provide answer out of the context pieces and do not make a reasoning.
-If you don't know the answer, you should output ""Unknown"".
+"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the second language spoken by the person in this Curriculum Vitae.
+Your output should be only one language, do not make a sentence.
+Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output ""Unknown"". If only one language is mentioned in the Curriculum Vitae, you should also output ""Unknown"".
 
 Curriculum Vitae : ```{context}```
-"," You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide proficiency level of the second language spoken by the candidate from the given context.
+"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the proficiency level of the second language spoken by the person in this Curriculum Vitae.
 Your output should be only the proficiency level, do not make a sentence.
-Take your time to read carefully the pieces in the context to provide the request field.
-Do not provide answer out of the context pieces and do not make a reasoning.
-If you don't know the answer, you should output ""Unknown"".
+Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output ""Unknown"". If only one language is mentioned in the Curriculum Vitae, you should also output ""Unknown"".
 
 <EXAMPLES>
 Native
@@ -120,36 +104,43 @@ Basic
 </EXAMPLES>
 
 Curriculum Vitae : ```{context}```
-"," You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide a comprehensive list of the technical skills of the candidate. Do not specify the technologies, frameworks and programming languages used.
-Take your time to read carefully the pieces in the context to provide the request field.
-Do not provide answer out of the context pieces.
+"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find the technical skills of the person in the Curriculum Vitae and provide a comprehensive list of those skills. You should not specify any of the technologies, frameworks and programming languages used.
+Your output should be only the list of technical skills, do not make a sentence.
+Do not provide answer out of the Curriculum Vitae.
 If you don't know the answer, you should output ""Unknown"".
 
-<EXAMPLES OF OUTPUTS>
+<EXAMPLE 1>
 - Coding, Data Science, Optimization, Signal Processing.
 - Mathematics, programming, teaching.
-</EXAMPLES OF OUTPUTS>
+</EXAMPLE 1>
+
+<EXAMPLE 2>
+- Mathematics, programming, teaching.
+</EXAMPLE 2>
 
 Curriculum Vitae : ```{context}```
-"," You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide a comprehensive list of the candidate's programming skills that are in high demand in the software development industry. 
-You may include languages, frameworks, libraries, and technologies.
-Take your time to read carefully the pieces in the context to provide the request field.
-Do not provide answer out of the context pieces.
+"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find the programming skills of the person in the Curriculum Vitae and provide a comprehensive list of those skills, that are in high demand in the software development industry. 
+Such skills include languages, frameworks, libraries, and technologies.
+Your output should be only the list of programming skills, do not make a sentence.
+Do not provide answer out of the Curriculum Vitae.
 If you don't know the answer, you should output ""Unknown"".
 
-<EXAMPLES OF OUTPUTS>
+<EXAMPLE 1>
 - Python, Java, C++, Matlab
 - Julia, Matlab, SQL, MongoDB.
-</EXAMPLES OF OUTPUTS>
+</EXAMPLE 1>
+
+<EXAMPLE 2>
+- Julia, Matlab, SQL, MongoDB.
+</EXAMPLE 2>
 
 Curriculum Vitae : ```{context}```
-","  You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide the highest degree of the candidate in the given context.
-Your output should be only the highest degree title of the candidate, do not make a sentence. Do not mention the institution. 
-Take your time to read carefully the pieces in the context to provide the request field.
-Do not provide answer out of the context pieces.
+","  You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the highest degree of the person in the Curriculum Vitae.
+Your output should be only the highest degree title, do not make a sentence. Do not mention the institution. 
+Do not provide answer out of the Curriculum Vitae.
 If you don't know the answer, you should output ""Unknown"".
 
 <EXAMPLES>
@@ -160,37 +151,115 @@ Bachelor
 </EXAMPLES>
 
 Curriculum Vitae : ```{context}```
-","  You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide the most current work position of the candidate in the given context.
-Your answer should include, if you can find it, the job title of the candidate, company or organization name and dates of employment.
-Your output should be only the current work position of the candidate, do not make a sentence.
-Take your time to read carefully the pieces in the context to provide the request field.
-Do not provide answer out of the context pieces.
+","  You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the most current work position of the person in the Curriculum Vitae.
+Your answer should include, if you can find it, dates of employment, the company or organisation name and the job or position title. 
+Try to give the most current work position in the following format:
+<FORMAT>
+- Job or Position title | Company or Organisation name | Start date - End date
+</FORMAT>
+Do not make a sentence.
+Do not provide answer out of the Curriculum Vitae.
 If you don't know the answer, you should output ""Unknown"".
 
+<EXAMPLE 1>
+- Directeur Général Adjoint, en charge de la Branche Intérim | Manpower | Janvier 1999 - Juin 2010
+</EXAMPLE 1>
+
+<EXAMPLE 2>
+- Software developer intern | Thalès | Mars 2014 - Avril 2021
+</EXAMPLE 2>
+
 Curriculum Vitae : ```{context}```
-","  You are an AI assistant who loves to help people! The texts provided to you are the resumes of the candidates.
-Your task is to provide the previous work position of the candidate in the given context.
-Your answer should include, if you can find it, the job title of the candidate, company or organization name and dates of employment.
-Your output should be only the previous work position of the candidate, do not make a sentence.
-Take your time to read carefully the pieces in the context to provide the request field.
-Do not provide answer out of the context pieces.
+","  You will be provided with a Curriculum Vitae delimited by triple backsticks.
+Your task is to find and provide the previous work position of the person in the Curriculum Vitae.
+Your answer should include, if you can find it, dates of employment, the company or organisation name and the job or position title. 
+Try to give the most previous work position in the following format:
+<FORMAT>
+- Job or Position title | Company or Organisation name | Start date - End date
+</FORMAT>
+Do not make a sentence.
+Do not provide answer out of the Curriculum Vitae.
 If you don't know the answer, you should output ""Unknown"".
+
+<EXAMPLE 1>
+- Directeur Général Adjoint, en charge de la Branche Intérim | Manpower | Janvier 1999 - Juin 2010
+</EXAMPLE 1>
+
+<EXAMPLE 2>
+- Software developer intern | Thalès | Mars 2020 - Avril 2021
+</EXAMPLE 2>
 
 Curriculum Vitae : ```{context}```
 "," You will be provided with a Curriculum Vitae, delimited by triple backsticks. 
-This Curriculum Vitae contains professional experiences. Each professional experience might be described by a date, a company or organisation name and a job or position title.
-Your task is to find and provide the list of all professional experiences of the person in this Curriculum Vitae.
+
+Your task is to find and provide the professional experiences (work experience, internship, volunteering experience) of the person in this Curriculum Vitae. 
+A professional experience includes dates of employment, the company or organisation name and the job or position title. 
+
+Your output should only be the list of all professional experiences of the person, do not give the description of the tasks performed by the person.
+
 If you did not find an experience, do not mention it in the list. If you cannot find any experience, your output should be ""Unknown"", not a list.
 Do not provide an answer out of the Curriculum Vitae. 
 
-Curriculum Vitae : ```{context}```
-Professional experience of the person:
-"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
-Your task is to find and provide the education of the person in this CV.
-Your output should be only the education, do not make a sentence.
-Do not provide answer out of the context pieces. If you did not find it, you should output ""Unknown"".
+After giving a first answer, try scanning again the Curriculum Vitae to see if you can find other pieces of relevant information that you did not include in your first answer. 
+Then, only if you found additional relevant pieces of information, provide a more complete answer.
+
+Try to give the list of professional experiences in the following format:
+<FORMAT>
+- Job or Position title 1 | Company or Organisation name 1 | Start date 1 - End date 1
+- Job or Position title 2 | Company or Organisation name 2 | Start date 2 - End date 2
+- Job or Position title 3 | Company or Organisation name 3 | Start date 3 - End date 3
+</FORMAT>
+
+Here are some examples of outputs:
+
+<EXAMPLE 1>
+- Co-Fondateur et Président | Mistral AI | Septembre 2010 - Aujourd'hui
+- Directeur Général Adjoint, en charge de la Branche Intérim | Manpower | Janvier 1999 - Juin 2010
+- Directeur RH | Manpower | Janvier 1997 - Janvier 1999
+</EXAMPLE 1>
+
+<EXAMPLE 2>
+- Data Scientist | Total | Juin 2021 - Today
+- Software developer intern | Thalès | Mars 2020 - Avril 2021
+</EXAMPLE 2>
 
 Curriculum Vitae : ```{context}```
-Education of the person :
+Professional experience of the person:
+","
+You will be provided with a Curriculum Vitae, delimited by triple backsticks. 
+
+Your task is to find and provide the educational programs (for instance:  High School, Bachelor, Masters) attended by the person in this Curriculum Vitae. 
+An educational program includes dates of attendance, the institution name and the program or degree title. 
+
+Your output should only be the list of all educational programs attended by the person, do not give the description of the program.
+
+If you did not find an educational program, do not mention it in the list. If you cannot find any education, your output should be ""Unknown"", not a list.
+Do not provide an answer out of the Curriculum Vitae. 
+
+After giving a first answer, try scanning again the Curriculum Vitae to see if you can find other pieces of relevant information that you did not include in your first answer. 
+Then, only if you found additional relevant pieces of information, provide a more complete answer.
+
+Try to give the list of the educational programs in the following format:
+<FORMAT>
+- Program or Degree title 1 | Institution name 1 | Start date 1 - End date 1
+- Program or Degree title 2 | Institution name 2 | Start date 2 - End date 2
+- Program or Degree title 3 | Institution name 3 | Start date 3 - End date 3
+</FORMAT>
+
+Here are some examples of outputs:
+
+<EXAMPLE 1>
+- Master of Science | Université Paris 6 | Septembre 2017 - Juin 2019
+- Licence de Physique | Université Sorbonne | Septembre 2014 - Juillet 2017
+- Baccalauréat S | Lycée Pierre-Gilles de Gênes | Juin 2014
+</EXAMPLE 1>
+
+<EXAMPLE 2>
+- Engineering degree | MIT | October 2020 - April 2023
+- Bachelor of Arts | Superior school of Journalism | August 2017 - September 2020
+</EXAMPLE 2>
+
+Curriculum Vitae : ```{context}```
+Education of the person:
 "
