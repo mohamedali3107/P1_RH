@@ -178,13 +178,14 @@ Do not provide answer out of the context pieces.
 If you don't know the answer, you should output ""Unknown"".
 
 Curriculum Vitae : ```{context}```
-"," You will be provided with a Curriculum Vitae delimited by triple backsticks.
-Your task is to find and provide the professional experience of the person in this CV.
-Your output should be only the professional experience, do not make a sentence.
-Do not provide answer out of the context pieces. If you did not find it, you should output ""Unknown"".
+"," You will be provided with a Curriculum Vitae, delimited by triple backsticks. 
+This Curriculum Vitae contains professional experiences. Each professional experience might be described by a date, a company or organisation name and a job or position title.
+Your task is to find and provide the list of all professional experiences of the person in this Curriculum Vitae.
+If you did not find an experience, do not mention it in the list. If you cannot find any experience, your output should be ""Unknown"", not a list.
+Do not provide an answer out of the Curriculum Vitae. 
 
 Curriculum Vitae : ```{context}```
-Professional experience of the person :
+Professional experience of the person:
 "," You will be provided with a Curriculum Vitae delimited by triple backsticks.
 Your task is to find and provide the education of the person in this CV.
 Your output should be only the education, do not make a sentence.
