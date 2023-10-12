@@ -88,7 +88,7 @@ prompt_concise = PromptTemplate(template=template_concise, input_variables=["con
 
 template_from_field = """
 You will be provided with :
-* a topic
+* a topic (or it could be several topics)
 * a piece of data about somebody regarding this topic (delimited by triple backsticks)
 * a question about the data of this person
 Your task is to answer the question using the provided data.
@@ -102,7 +102,7 @@ Data     : ```30```
 Question : Is he or she more than 25 years old ?
 Answer   : Yes
 
-Topic    : Name
+Topic    : First name, Family name
 Data     : ```Luke Skywalker```
 Question : What is her or his name ?
 Answer   : Luke Skywalker

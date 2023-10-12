@@ -1,7 +1,7 @@
 
 from langchain.prompts import PromptTemplate
 
-template_extract_field = """* Situation : A recruiter is asking a question about a candidate
+template_extract_fields = """* Situation : A recruiter is asking a question about a candidate
 for a job.
 * Your task : Based on the recruiter's question, identify what topic or topics this question is about
 among a list of possible topics, in between triple backsticks. 
@@ -33,4 +33,4 @@ Possible topics : < ```{topics}``` >
 Question of the recruiter : {question}
 Your output : """
 
-prompt_extract_field = PromptTemplate(template=template_extract_field, input_variables=["topics", "question"])
+prompt_extract_fields = PromptTemplate(template=template_extract_fields, input_variables=["topics", "question"])

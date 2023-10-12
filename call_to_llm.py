@@ -1,6 +1,8 @@
 from langchain.chains import LLMChain
 import treat_query
 import manage_transversal_query
+import filtered_query
+import loading_preprocessing_multi
 
 def create_context_from_chunks(docs) :
     '''Concatenate the content of retrieved documents as a context to be fed to the llm
@@ -80,9 +82,8 @@ def create_context_from_dict(dict_db, field) :
     return context
 
 def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', llm='default') :
-    fields = treat_query.extract_target_field(query_multi, list_of_fields, llm=llm)
-    print('detected field(s) :', fields)
-    fields_as_list = fields.split(', ')
+    fields_as_list = treat_query.extract_target_fields(query_multi, list_of_fields, llm=llm)
+    print('detected field(s) :', fields_as_list)
     operation = treat_query.detect_operation_from_query(query_multi, llm=llm)
     if operation == 'Condition' :
         mono_query = treat_query.multi_to_mono(query_multi)
@@ -105,12 +106,16 @@ def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', ll
         print('Type of tranversal question not supported yet')
         return ''
 
-def ask_question_dict(dict_db, question, list_of_fields, chain='default', llm='default') :
+def ask_question_dict(dict_db, csv_file, all_loaded, question, chain='default', llm='default') :
+    '''Assumes all CVs to study have been loaded (ideally does not assume all fields and loads missing, todo)'''
+    list_of_fields = loading_preprocessing_multi.list_of_fields_csv(csv_file)
     mode = treat_query.detect_query_type(question, llm=llm)
     if mode == 'transverse' :
         return ask_question_multi(dict_db, question, list_of_fields, chain=chain, llm=llm)
     elif mode == 'single' :
-        print('Not implemented yet')
+        # todo : exceptions
+        list_of_names = list(all_loaded.values())
+        return filtered_query.ask_filtered_query(dict_db, question, list_of_names, list_of_fields, llm=llm)
     else :
         print('Mode transverse/single unclear')
     return ''

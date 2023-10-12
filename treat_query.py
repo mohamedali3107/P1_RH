@@ -14,14 +14,15 @@ def multi_to_mono(query_multi, llm='default') :
     chain_to_mono_query = LLMChain(llm=llm, prompt=prompt_multi_to_mono)
     return chain_to_mono_query.predict(question=query_multi)
 
-def extract_target_field(query, list_of_fields, llm='default') :
+def extract_target_fields(query, list_of_fields, llm='default') :
     '''Determine what field is targeted by a query, among a list of possible fields'''
     if llm == 'default' :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
     print(query)
-    chain_field = LLMChain(llm=llm, prompt=prompt_interrogate_field.prompt_extract_field)
+    chain_fields = LLMChain(llm=llm, prompt=prompt_interrogate_field.prompt_extract_fields)
     fields = ", ".join(list_of_fields)
-    return chain_field.predict(topics=fields, question=query)
+    output = chain_fields.predict(topics=fields, question=query)
+    return output.split(', ')
 
 def detect_query_type(question, llm='default') :
     if llm == 'default' :
