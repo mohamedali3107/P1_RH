@@ -120,6 +120,13 @@ def ask_question_dict(dict_db, csv_file, all_loaded, question, chain='default', 
         print('Mode transverse/single unclear')
     return ''
     
-
-def query_apply_condition(dict_db, question, field) :
-    return
+def test_question_dico() :
+    csv_file = loading_preprocessing_multi.load_csv("data_template_concise_no_double.csv")
+    dict_db = {}
+    loaded = {}
+    loading_preprocessing_multi.load_full_csv_to_dict(csv_file, dict_db, loaded)
+    #fields = loading_preprocessing_multi.list_of_fields_csv(csv_file)
+    print(list(loaded.values()))
+    question = input("query ? ")
+    res = ask_question_dict(dict_db, csv_file, loaded, question, chain='default', llm='default')
+    print(res)
