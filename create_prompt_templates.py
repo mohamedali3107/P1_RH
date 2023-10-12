@@ -222,13 +222,15 @@ Bachelor
 Curriculum Vitae : ```{context}```
 """,
 """  You will be provided with a Curriculum Vitae delimited by triple backsticks.
-Your task is to find and provide the most current work position of the person in the Curriculum Vitae.
+Your task is to find the professional experiences (work experience, internship, volunteering experience) of the person in this Curriculum Vitae, including the dates of employment and then provide the most current work experience among this list.
 Your answer should include, if you can find it, dates of employment, the company or organisation name and the job or position title. 
-Try to give the most current work position in the following format:
+Try to give the most current work experience in the following format:
+
 <FORMAT>
 Job or Position title | Company or Organisation name | Start date - End date
 </FORMAT>
-Do not make a sentence.
+
+Your output should consist of only one work position. Do not make a sentence.
 Do not provide answer out of the Curriculum Vitae.
 If you don't know the answer, you should output "Unknown".
 
@@ -246,10 +248,12 @@ Curriculum Vitae : ```{context}```
 Your task is to find and provide the previous work position of the person in the Curriculum Vitae.
 Your answer should include, if you can find it, dates of employment, the company or organisation name and the job or position title. 
 Try to give the most previous work position in the following format:
+
 <FORMAT>
 Job or Position title | Company or Organisation name | Start date - End date
 </FORMAT>
-Do not make a sentence.
+
+Your output should consist of only one work position. Do not make a sentence.
 Do not provide answer out of the Curriculum Vitae.
 If you don't know the answer, you should output "Unknown".
 
@@ -277,6 +281,7 @@ After giving a first answer, try scanning again the Curriculum Vitae to see if y
 Then, only if you found additional relevant pieces of information, provide a more complete answer.
 
 Try to give the list of professional experiences in the following format:
+
 <FORMAT>
 - Job or Position title 1 | Company or Organisation name 1 | Start date 1 - End date 1
 - Job or Position title 2 | Company or Organisation name 2 | Start date 2 - End date 2
