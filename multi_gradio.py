@@ -109,4 +109,31 @@ demoGradioQA_MultipleCV = gr.Interface(
     outputs = [gr.Textbox(label = 'Answer')] + list(chain_list.from_iterable((gr.Textbox(label = f'Chunk #{i+1}'), gr.Textbox(label = f'Metadata #{i+1}')) for i in range(nb_chunks))) + [gr.Textbox(label = 'Exact prompt')]
 )
 
-demoGradioQA_MultipleCV.launch(inbrowser=True)
+def fn_gradio_QA_from_csv(question):
+    csv_file = loading_preprocessing_multi.load_csv("data_template_concise_no_double.csv")
+    dict_db = {}
+    loaded = {}
+    loading_preprocessing_multi.load_full_csv_to_dict(csv_file, dict_db, loaded)
+    return call_to_llm.ask_question_dict(dict_db, csv_file, loaded, question, chain='default', llm='default')
+
+questions = [
+"List the phone numbers of all the candidates.",
+"Which candidate is proficient in Python?"
+]
+
+demoGradioQA_FromCSV = gr.Interface(
+    fn = fn_gradio_QA_from_csv,
+    inputs =
+    [
+        gr.Dropdown(
+            questions, label="Question", info="Select the question you want to ask over this pool of candidates."
+        )
+    ],
+    outputs=
+    [
+        gr.Textbox(label = "Answer")
+    ],
+)
+
+#demoGradioQA_MultipleCV.launch(inbrowser=True)
+demoGradioQA_FromCSV.launch(inbrowser=True)
