@@ -85,3 +85,41 @@ Universit´ e Paris-Sud, Orsay ```
 <answer> :"""
 
 prompt_concise = PromptTemplate(template=template_concise, input_variables=["context", "question"])
+
+template_from_field = """
+You will be provided with :
+* a topic
+* a piece of data about somebody regarding this topic (delimited by triple backsticks)
+* a question about the data of this person
+Your task is to answer the question using the provided data.
+Keep it as concise as possible.
+If you did not find the answer, do not try to make up an answer, just answer 'Unknown'.
+If the query is a yes-no question, answer just 'Yes' or 'No' or 'Unknown'.
+
+<EXAMPLES>
+Topic    : Age
+Data     : ```30```
+Question : Is he or she more than 25 years old ?
+Answer   : Yes
+
+Topic    : Name
+Data     : ```Luke Skywalker```
+Question : What is her or his name ?
+Answer   : Luke Skywalker
+
+Topic    : Education
+Data     : ```Normalien, mathématiques.\nErasmus de 8 mois à Cardiff University
+\nAgrégation de mathématiques (39e/310)
+\n2015-2019
+\nLycée Charles et Adrien Dupuy, Clermont-Ferrand
+\nClasses préparatoires PC*```
+Question : Where did he or she study ?
+Answer   : Lycée Charles et Adrien Dupuy in Clermont-Ferrand and Cardiff University
+</EXAMPLES>
+
+Topic    : {topic}
+Data     : ```{data}```
+Question : {question}
+Answer   :"""
+
+prompt_from_field = PromptTemplate(template=template_from_field, input_variables=["topic", "data", "question"])

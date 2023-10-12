@@ -89,7 +89,7 @@ Your output should be only one word that is one of the possible operations :
                                 "Comparison",
                                 "MinMax",
                                 "Condition",
-                                "All,
+                                "All",
                                 "Unknown"
                                 ]
 

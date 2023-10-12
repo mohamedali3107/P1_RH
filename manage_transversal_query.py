@@ -25,14 +25,18 @@ data_dir = 'data/' # todo : faire en sorte que pas besoin
 #         res[meta] = output
 #     return res
 
-def outputs_from_dict(dict_db, question, field, chain='default', llm='default') :
+def outputs_from_dict(dict_db, question, fields, chain='default', llm='default') :
     if llm == 'default' :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
     if chain == 'default' :
-        chain = LLMChain(llm=llm, prompt=prompt_single_cv.prompt_concise)
+        chain = LLMChain(llm=llm, prompt=prompt_single_cv.prompt_from_field)
     outputs = {}
-    for meta in dict_db[field] :
-        output = chain.predict(context=dict_db[field][meta], question=question)
+    # todo : exception
+    for meta in dict_db[fields[0]] :
+        data = []
+        for field in fields :
+            data.append(dict_db[field][meta])
+        output = chain.predict(topic=fields, data=data, question=question) # lists
         outputs[meta] = output
         #print('output for', meta, 'on field value', dict_db[field][meta], ':', output)
     return outputs

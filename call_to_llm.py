@@ -80,12 +80,13 @@ def create_context_from_dict(dict_db, field) :
     return context
 
 def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', llm='default') :
-    field = treat_query.extract_target_field(query_multi, list_of_fields, llm=llm)
-    print('detected field :', field)
+    fields = treat_query.extract_target_field(query_multi, list_of_fields, llm=llm)
+    print('detected field(s) :', fields)
+    fields_as_list = fields.split(', ')
     operation = treat_query.detect_operation_from_query(query_multi, llm=llm)
     if operation == 'Condition' :
         mono_query = treat_query.multi_to_mono(query_multi)
-        outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, field, chain=chain, llm=llm)
+        outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, fields_as_list, chain=chain, llm=llm)
         selected_candidates = []
         for meta in outputs :
             if outputs[meta] == 'Yes' :
@@ -95,10 +96,10 @@ def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', ll
         return ", ".join(selected_candidates)
     elif operation == 'All' :
         mono_query = treat_query.multi_to_mono(query_multi)
-        outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, field, chain=chain, llm=llm)
+        outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, fields_as_list, chain=chain, llm=llm)
         global_output = ""
         for meta in outputs :
-            global_output += meta + ' : ' + outputs[meta]
+            global_output += meta + ' : ' + outputs[meta] + '\n'
         return global_output
     else :
         print('Type of tranversal question not supported yet')
