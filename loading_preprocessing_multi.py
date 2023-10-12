@@ -1,7 +1,8 @@
 import os
+import pandas as pd
 from langchain.document_loaders import PyPDFDirectoryLoader  # tt un dossier, ms mm pb que PyPDFLoader
 from langchain.document_loaders import PyPDFLoader  # probleme d'espaces intempestifs
-from langchain.document_loaders import UnstructuredPDFLoader # ne preserve pas l'ordre du texte
+#from langchain.document_loaders import UnstructuredPDFLoader # ne preserve pas l'ordre du texte
 from langchain.document_loaders import PyMuPDFLoader
 
 def list_of_files(data_dir) :
@@ -42,29 +43,36 @@ def load_files_all_at_once(data_dir, persist_directory) :
 
 ###########################
 
-def list_of_fields_csv(csv_file) :
-    # to implement
-    return ['file name', 'first name', 'family name', 'gender', 'age', 'e-mail', 'phone number', 'current job']
+def load_csv(csv_file) :
+    return pd.read_csv(csv_file)
 
-def labels_from_csv(csv_file) :
-    # to implement
-    return ['cv1', 'cat2', 'cv3', 'cat4', 'cv5', 'cv6']
+def list_of_fields_csv(csv_file) :
+    return list(csv_file)
+
+def labels_from_csv(csv_file, label_field="Filename") :
+    return list(csv_file[label_field].values)
+
+def load_field_data_from_csv(csv_file, label, field) :
+    '''Read a specified value in a csv'''
+    table = csv_file[csv_file["Filename"]==label][field].values # should contain only one value
+    try :
+        return table[0]
+    except IndexError :
+        print("Error : association file name / field does not exist")
+        return ""
 
 def meta_of_file_from_csv(csv_file, label) :
     '''Output metadata to be used as key in dict_db'''
     fields = list_of_fields_csv(csv_file)
-    field_first_name, field_family_name = fields[1], fields[2]
+    field_first_name, field_family_name = fields[2], fields[3]
     first_name= load_field_data_from_csv(csv_file, label, field_first_name)
     family_name = load_field_data_from_csv(csv_file, label, field_family_name)
-    return 'name' + ' ' + label  # output temporaire pour tests
+    if first_name == 'Unknown' or family_name == 'Unknown' :
+        return label
+    return first_name + ' ' + family_name
 
 def update_pool_loaded_CV(all_loaded_CV, label, meta) :  # todo : meta ou label ?
     all_loaded_CV[label] = meta  # maybe pre-existant but ok
-
-def load_field_data_from_csv(csv_file, label, field) :
-    '''Read a specified value in a csv'''
-    # to implement
-    return field + label
 
 def update_dict_with_field_value(dict_db, field, value, meta) :  # keep tests ?
     '''Add a value from a structured CV to the corresponding field of the dictionary
@@ -107,7 +115,7 @@ def update_dict_with_CV(dict_db, label, csv_file, all_loaded_CV, full=False) :
     meta = meta_of_file_from_csv(csv_file, label)
     if not full :
         for field in dict_db :
-            data = load_field_data_from_csv(csv_file, meta, field)
+            data = load_field_data_from_csv(csv_file, label, field)
             update_dict_with_field_value(dict_db, field, data, meta)
     else :
         list_of_fields = list_of_fields_csv(csv_file)
