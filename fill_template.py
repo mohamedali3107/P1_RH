@@ -30,8 +30,8 @@ prompts_df = pd.read_csv("prompt_templates_concise.csv")
 persist_directory = './chroma_single/'
 loader_method = 'PyMuPDFLoader'
 splitter = RecursiveCharacterTextSplitter(
-    chunk_size=200,
-    chunk_overlap=40, 
+    chunk_size=600,
+    chunk_overlap=100, 
     separators=["\n\n", "\n", " ", ""]
 )
 embedding = OpenAIEmbeddings()
@@ -71,11 +71,13 @@ def fill_one_row(template_path, file, save=False, verbose=False):
             chain = call_to_llm.create_chain(llm, prompt)
 
             ## Retrieving and calling the LLM
-            sources = vectorstore_lib.retrieving(retriever_obj, field, retriever_type="vectordb", with_scores=False)
-            context = call_to_llm.create_context_from_retrieved_chunks(sources)
+            sources = vectorstore_lib.retrieving(retriever_obj, field, retriever_type="vectordb", with_scores=True)
+            context = call_to_llm.create_context_from_chunks(sources)
             answer = chain.predict(context=context, field=field)
             data.append(answer)
             if verbose:
+                print(f"Filling the {field}... Here are the retrieved chunks with scores: \n\n")
+                call_to_llm.print_chunks(sources)
                 print(data)
         new_row = pd.DataFrame(columns=fields, data=[data])
         if save:
@@ -83,31 +85,18 @@ def fill_one_row(template_path, file, save=False, verbose=False):
             template_df.to_csv(template_path, index=False)
         return list(new_row.iloc[0])
 
-def fill_whole_template(template_path, complete_paths):
+def fill_whole_template(template_path, complete_paths, print_time):
     t0 = time.time()
     for file in complete_paths:
         try:
             fill_one_row(template_path, file, save=True, verbose=True)
         except:
             print("Error filling the template for " + file)
-    return "Time to fill the template for all CVs: {:.2f}s".format(time.time()-t0)
+    if print_time:
+        print("Time to fill the template for all CVs: {:.2f}s".format(time.time()-t0))
 
-demo = gr.Interface(
-    fn = lambda file: fill_one_row(template_path, file, verbose=True),
-    inputs =
-    [
-        gr.Dropdown(
-            complete_paths, label="File", info="Select the file you want to analyze"
-        )
-    ],
-    outputs=
-    [
-        gr.Textbox(label = field) for field in list(pd.read_csv(template_path))
-    ],
-    description = "Analyzes a file according to the given template"
-)
-
-demo.launch(inbrowser=True)
 # file = complete_paths[0]
 # print(fill_one_row(template_path, file, verbose=True))
-#print(fill_whole_template(template_path, complete_paths))
+
+if __name__ == "__main__":
+    fill_whole_template(template_path, complete_paths, print_time=True)
