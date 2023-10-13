@@ -85,7 +85,7 @@ def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', ll
     fields_as_list = treat_query.extract_target_fields(query_multi, list_of_fields, llm=llm)
     print('detected field(s) :', fields_as_list)
     operation = treat_query.detect_operation_from_query(query_multi, llm=llm)
-    if operation == 'Condition' :
+    if operation == 'Condition' or operation == 'Comparison' :
         mono_query = treat_query.multi_to_mono(query_multi)
         outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, fields_as_list, chain=chain, llm=llm)
         selected_candidates = []

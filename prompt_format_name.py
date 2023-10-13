@@ -11,7 +11,7 @@ If you did not find it, you should output "Unknown".
 
 <example 1>
 Possible names : [ Martine Laurent, Philippe Poutou, Bruce Bayne, Léa Sandman ]
-Provided name : lea Sandman
+Provided name : lea
 Identified name : Léa Sandman
 </example 1>
 
