@@ -20,6 +20,8 @@ from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv()) # read local .env file
 openai.api_key  = os.environ['OPENAI_API_KEY']
 
+########## QA V0 (FROM THE DOCS) ##########
+
 ########## Parameters ##########
 
 data_dir = 'data/'
@@ -109,6 +111,10 @@ demoGradioQA_MultipleCV = gr.Interface(
     outputs = [gr.Textbox(label = 'Answer')] + list(chain_list.from_iterable((gr.Textbox(label = f'Chunk #{i+1}'), gr.Textbox(label = f'Metadata #{i+1}')) for i in range(nb_chunks))) + [gr.Textbox(label = 'Exact prompt')]
 )
 
+#demoGradioQA_MultipleCV.launch(inbrowser=True)
+
+########## QA V1 (FROM THE FILLED CSV) ##########
+
 def fn_gradio_QA_from_csv(question):
     csv_file = loading_preprocessing_multi.load_csv("data_template_concise_no_double.csv")
     dict_db = {}
@@ -116,24 +122,38 @@ def fn_gradio_QA_from_csv(question):
     loading_preprocessing_multi.load_full_csv_to_dict(csv_file, dict_db, loaded)
     return call_to_llm.ask_question_dict(dict_db, csv_file, loaded, question, chain='default', llm='default')
 
-questions = [
+demo_questions = [
 "List the phone numbers of all the candidates.",
-"Which candidate is proficient in Python?"
+"What candidates are proficient in Python?",
+"What is the education of Léo?",
+"What are the skills of sebastien?",
+"What candidates speak Spanish?"
 ]
 
-demoGradioQA_FromCSV = gr.Interface(
-    fn = fn_gradio_QA_from_csv,
-    inputs =
-    [
-        gr.Dropdown(
-            questions, label="Question", info="Select the question you want to ask over this pool of candidates."
+with gr.Blocks() as demoGradioQA_FromCSV:
+    gr.Markdown(
+    """
+    # Multi-CV Q&A Demo
+    ## From a given sample of questions
+    Select below the question you want to ask over the pool of candidates:
+    """)
+    question_from_sample = gr.Dropdown(
+            demo_questions, label="Question:"
         )
-    ],
-    outputs=
-    [
-        gr.Textbox(label = "Answer")
-    ],
-)
+    answer_from_sample = gr.Textbox(label = "Answer:")
+    question_from_sample.change(fn_gradio_QA_from_csv, question_from_sample, answer_from_sample)
+    # gr.Markdown(
+    # """
+    # ## From a user input question
+    # Type the question you want to ask over the pool of candidates:
+    # """)
+    # question_from_input = gr.Textbox(label = "Question:")
+    # answer_from_input = gr.Textbox(label = "Answer:")
+    # with gr.Row():
+    #     submit_btn = gr.Button("Submit")
+    #     submit_btn.click(fn=fn_gradio_QA_from_csv, inputs=question_from_input, outputs=answer_from_input, api_name="multiQA_FromCSV")
+    #     clear_btn = gr.ClearButton(value="Clear")
+    #     clear_btn.click(fn=fn_gradio_QA_from_csv, inputs=question_from_input, outputs=answer_from_input)
+    
 
-#demoGradioQA_MultipleCV.launch(inbrowser=True)
 demoGradioQA_FromCSV.launch(inbrowser=True)
