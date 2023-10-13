@@ -38,12 +38,12 @@ embedding = OpenAIEmbeddings()
 llm_name = 'gpt-3.5-turbo'
 llm = ChatOpenAI(model_name=llm_name, temperature=0)
 
-def fill_one_row(template_path, file, save=False, verbose=False):
+def fill_one_row(template_path, file, force_refill, save=False, verbose=False):
 
     template_df = pd.read_csv(template_path)
     fields = list(template_df) 
-    
-    if file in template_df["Filename"].unique():
+
+    if not force_refill and file in template_df["Filename"].unique():
         print("This CV has already been parsed")
         return template_df.loc[template_df["Filename"] == file].values.tolist()[0] # Returns the corresponding row
     
@@ -85,11 +85,11 @@ def fill_one_row(template_path, file, save=False, verbose=False):
             template_df.to_csv(template_path, index=False)
         return list(new_row.iloc[0])
 
-def fill_whole_template(template_path, complete_paths, print_time):
+def fill_whole_template(template_path, complete_paths, print_time, force_refill=True):
     t0 = time.time()
     for file in complete_paths:
         try:
-            fill_one_row(template_path, file, save=True, verbose=True)
+            fill_one_row(template_path, file, force_refill, save=True, verbose=True)
         except:
             print("Error filling the template for " + file)
     if print_time:

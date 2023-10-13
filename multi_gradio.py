@@ -13,6 +13,7 @@ import vectorstore_lib
 import prompt_multi_cv
 import call_to_llm
 import gradio_lib
+import fill_template
 
 import os
 import openai
@@ -116,7 +117,9 @@ demoGradioQA_MultipleCV = gr.Interface(
 ########## QA V1 (FROM THE FILLED CSV) ##########
 
 def fn_gradio_QA_from_csv(question):
-    csv_file = loading_preprocessing_multi.load_csv("data_template_concise_no_double.csv")
+    """Double pdfs should be removed from the data folder"""
+    fill_template.fill_whole_template(fill_template.template_path, fill_template.complete_paths, print_time=False, force_refill=False)
+    csv_file = loading_preprocessing_multi.load_csv(fill_template.template_path)
     dict_db = {}
     loaded = {}
     loading_preprocessing_multi.load_full_csv_to_dict(csv_file, dict_db, loaded)
