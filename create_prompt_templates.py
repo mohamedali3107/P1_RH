@@ -136,6 +136,27 @@ Your task is to find and provide the first language spoken by the person in this
 Your output should be only one language, do not make a sentence.
 Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output "Unknown".
 
+<EXAMPLE 1>
+Curriculum Vitae:
+
+Français : courant
+Allemand, Anglais et Espagnol : basique
+
+First language:
+
+Français
+</EXAMPLE 1>
+
+<EXAMPLE 1>
+Curriculum Vitae:
+
+Fluent English, intermediate French and notions of Japanese.
+
+First language:
+
+English
+</EXAMPLE 1>
+
 Curriculum Vitae : ```{context}```
 """,
 """ You will be provided with a Curriculum Vitae delimited by triple backsticks.
@@ -144,10 +165,15 @@ Your output should be only the proficiency level, do not make a sentence.
 Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output "Unknown".
 
 <EXAMPLES>
+
 Native
+
 Fluent 
+
 Intermediate
+
 Basic
+
 </EXAMPLES>
 
 Curriculum Vitae : ```{context}```
