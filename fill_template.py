@@ -39,11 +39,19 @@ llm_name = 'gpt-3.5-turbo'
 llm = ChatOpenAI(model_name=llm_name, temperature=0)
 
 def fill_one_row(template_path, file, force_refill, save=False, verbose=False):
+    """
+    Inputs:
+        template_path: name of the csv file (it is rather a name than a path...)
+        file: filename of the CV to parse
+        force_refill: if True and if the CV has already been parsed, fills in the same row again anyway
+        save: if True, fills a row in the csv
+        verbose: if True, prints the retrieved chunks and corresponding scores for each field
+    """
 
     template_df = pd.read_csv(template_path)
     fields = list(template_df) 
 
-    if not force_refill and file in template_df["Filename"].unique():
+    if file in template_df["Filename"].unique() and not force_refill:
         print("This CV has already been parsed")
         return template_df.loc[template_df["Filename"] == file].values.tolist()[0] # Returns the corresponding row
     
@@ -79,10 +87,14 @@ def fill_one_row(template_path, file, force_refill, save=False, verbose=False):
                 print(f"Filling the {field}... Here are the retrieved chunks with scores: \n\n")
                 call_to_llm.print_chunks(sources)
                 print(data)
-        new_row = pd.DataFrame(columns=fields, data=[data])
         if save:
-            template_df = pd.concat([template_df, new_row], ignore_index=True)
-            template_df.to_csv(template_path, index=False)
+            if file in template_df["Filename"].unique():
+                template_df.loc[template_df["Filename"] == file] = data
+            else:
+                new_row = pd.DataFrame(columns=fields, data=[data])
+                template_df = pd.concat([template_df, new_row], ignore_index=True)
+                template_df.to_csv(template_path, index=False)
+                #return list(new_row.iloc[0])
         return data
 
 def fill_whole_template(template_path, complete_paths, print_time, force_refill=True):
@@ -99,4 +111,4 @@ def fill_whole_template(template_path, complete_paths, print_time, force_refill=
 # print(fill_one_row(template_path, file, verbose=True))
 
 if __name__ == "__main__":
-    fill_whole_template(template_path, complete_paths, print_time=True)
+    fill_whole_template(template_path, complete_paths, print_time=True, force_refill=True)

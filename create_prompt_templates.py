@@ -5,43 +5,6 @@ template_path = "data_template_concise.csv"
 template_df = pd.read_csv(template_path)
 fields = list(template_df)
 
-# ## Prompt for retrieving the last position of the candidate
-# prompt_last_position = """ You are an AI assistant who loves to help people!
-
-# The texts provided to you are the resumes of the candidates.
-
-# Your task is to provide the details about the most recent position of the candidate in the given context
-
-# Your answer maybe the job title of the candidate, company/organization name, dates of employment
-
-# Take your time to read carefully the pieces in the context to provide the request field.
-
-# Do not provide answer out of the context pieces.
-
-# If you don't know the answer, you should output "Unknown".
-
-# Always say "thanks for asking!" at the end of the answer.
-
-# {context}
-
-# Question: {query}
-
-# Answer the question in the language of the question
-
-# Helpful Answer:
-# """
-
-
-#### TEMPLATE #####
-# You will be provided with a Curriculum Vitae, delimited by triple backsticks. 
-
-# Your task is to find and provide the educational programs (for instance:  High School, Bachelor, Masters) attended by the person in this Curriculum Vitae. 
-# An educational program includes dates of attendance, the institution name and the program or degree title. 
-
-# Your output should only be the list of all educational programs attended by the person, do not give the description of the program.
-
-# If you did not find an educational program, do not mention it in the list. If you cannot find any education, your output should be "Unknown", not a list.
-# Do not provide an answer out of the Curriculum Vitae. 
 
 prompts_concise_v0 = [[""] +              # Avoiding the first field (=filename)
 [f"""You will be provided with a Curriculum Vitae delimited by triple backsticks.
@@ -134,13 +97,14 @@ Curriculum Vitae : ```{context}```
 """ You will be provided with a Curriculum Vitae delimited by triple backsticks.
 Your task is to find and provide the first language spoken by the person in this Curriculum Vitae.
 Your output should be only one language, do not make a sentence.
-Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output "Unknown".
+Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output "Unknown". If only one language is mentioned in the Curriculum Vitae, you should also output "Unknown".
 
 <EXAMPLE 1>
-Curriculum Vitae:
+Languages spoken with proficiency level:
 
 Français : courant
 Allemand, Anglais et Espagnol : basique
+
 
 First language:
 
@@ -148,9 +112,10 @@ Français
 </EXAMPLE 1>
 
 <EXAMPLE 1>
-Curriculum Vitae:
+Languages spoken with proficiency level:
 
 Fluent English, intermediate French and notions of Japanese.
+
 
 First language:
 

@@ -130,7 +130,7 @@ demo_questions = [
 "What candidates are proficient in Python?",
 "What is the education of Léo?",
 "What are the skills of sebastien?",
-"What candidates speak Spanish?"
+"What candidates speak English?"
 ]
 
 with gr.Blocks() as demoGradioQA_FromCSV:
