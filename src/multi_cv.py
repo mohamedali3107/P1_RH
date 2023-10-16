@@ -9,7 +9,7 @@ from langchain.prompts import PromptTemplate
 # my modules 
 import loading_preprocessing_multi
 import vectorstore_lib
-import prompt_multi_cv
+import prompts.prompt_multi_cv as pr_multi
 import call_to_llm
 
 import os
@@ -20,8 +20,8 @@ openai.api_key  = os.environ['OPENAI_API_KEY']
 
 ########## Parameters ##########
 
-data_dir = 'data/'
-persist_directory = './chroma_multi/'
+data_dir = '../data/'
+persist_directory = '../chroma_multi/'
 
 ## Loader :
 loader_method = 'PyMuPDFLoader'
@@ -93,7 +93,7 @@ retriever_with_filter = SelfQueryRetriever.from_llm(
 retriever_obj = retriever_with_filter
 
 ## Prepare chain with prompt template
-prompt_multi = prompt_multi_cv.prompt  # generic multi CV, see external file
+prompt_multi = pr_multi.prompt  # generic multi CV, see external file
 chain = call_to_llm.create_chain(llm,  prompt_multi)
 
 ######### Main loop #########

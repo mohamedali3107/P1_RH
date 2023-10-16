@@ -1,8 +1,8 @@
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
-import prompt_single_cv
-import prompt_extract_names
-import prompt_format_name
+import prompts.prompt_extract_names as prompt_extract_names
+import prompts.prompt_format_name as prompt_format_name
+import prompts.prompt_single_cv as prompt_single_cv
 import treat_query
 
 def ask_filtered_query(dict_db, question, list_of_names, list_of_fields, llm='default') :
@@ -16,7 +16,7 @@ def ask_filtered_query(dict_db, question, list_of_names, list_of_fields, llm='de
     print('Candidate :', name)
     # identify field
     fields = treat_query.extract_target_fields(question, list_of_fields, llm=llm)
-    # retrieve datadata = []
+    # retrieve data
     data = []
     for field in fields :
         data.append(dict_db[field][name])

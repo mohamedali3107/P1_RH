@@ -10,7 +10,7 @@ from itertools import chain as chain_list
 # my modules 
 import loading_preprocessing_multi
 import vectorstore_lib
-import prompt_multi_cv
+import prompts.prompt_multi_cv as pr_multi
 import call_to_llm
 import gradio_lib
 import fill_template
@@ -25,8 +25,8 @@ openai.api_key  = os.environ['OPENAI_API_KEY']
 
 ########## Parameters ##########
 
-data_dir = 'data/'
-persist_directory = './chroma_multi/'
+data_dir = '../data/'
+persist_directory = '../chroma_multi/'
 
 ## Loader :
 loader_method = 'PyMuPDFLoader'
@@ -97,7 +97,7 @@ retriever_with_filter = SelfQueryRetriever.from_llm(
 retriever_obj = retriever_with_filter
 
 ## Prepare chain with prompt template
-prompt = prompt_multi_cv.prompt  # generic multi CV, see external file
+prompt = pr_multi.prompt  # generic multi CV, see external file
 
 def fn_gradio_QA(question, with_source, print_prompt) :
     '''Assumes : retriever_obj, prompt, llm (kinda dirty)'''

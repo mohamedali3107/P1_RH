@@ -17,17 +17,17 @@ from langchain.prompts import PromptTemplate
 _ = load_dotenv(find_dotenv()) # read local .env file
 openai.api_key  = os.environ['OPENAI_API_KEY']
 
-template_path = "data_template_concise.csv"
-cv_path = "data/"
+template_path = "../data_template_concise.csv"
+cv_path = "../data/"
 complete_paths = [cv_path+file for file in os.listdir(cv_path) if 'pdf' in file]
 
 # Loading the prompt templates (different for each field)
-prompts_df = pd.read_csv("prompt_templates_concise.csv")
+prompts_df = pd.read_csv("prompts/table_prompts.csv")
 
 
 ########## LLM Chain parameters ##########
 
-persist_directory = './chroma_single/'
+persist_directory = '../chroma_single/'
 loader_method = 'PyMuPDFLoader'
 splitter = RecursiveCharacterTextSplitter(
     chunk_size=600,
@@ -63,7 +63,7 @@ def fill_one_row(template_path, file, force_refill, save=False, verbose=False):
         data = [file] # First field is the filename
 
         ## Vectorstore and retriever creation
-        subprocess.run('rm -rf ./chroma_single/', shell=True)
+        subprocess.run('rm -rf ' + persist_directory, shell=True)
         chunks = vectorstore_lib.splitting_of_docs(cv, splitter)
         vectordb = vectorstore_lib.new_vectordb(chunks, 
                                 embedding, 

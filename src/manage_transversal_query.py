@@ -1,7 +1,7 @@
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
 # my modules
-import prompt_single_cv
+import prompts.prompt_single_cv as pr_single
 
 #data_dir = 'data/' # todo : faire en sorte que pas besoin
 # def list_of_outputs_from_vectorstore(vectordb, metadata_ids, query_multi, llm='default') :
@@ -28,7 +28,7 @@ def outputs_from_dict(dict_db, question, fields, chain='default', llm='default',
     if llm == 'default' :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
     if chain == 'default' :
-        chain = LLMChain(llm=llm, prompt=prompt_single_cv.prompt_from_field)
+        chain = LLMChain(llm=llm, prompt=pr_single.prompt_from_field)
     outputs = {}
     # todo : exception
     for meta in dict_db[fields[0]] :

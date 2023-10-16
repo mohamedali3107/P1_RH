@@ -1,7 +1,7 @@
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 import loading_preprocessing_multi
-import prompt_extract_names
+import prompts.prompt_extract_names as pr_names
 import os
 import openai
 from dotenv import load_dotenv, find_dotenv
@@ -13,7 +13,7 @@ def add_name_as_metadata(docs, data_dir, llm='default') :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
     list_of_names_as_str = ""
     files = loading_preprocessing_multi.list_of_files(data_dir)
-    prompt_names = prompt_extract_names.prompt_file_name  # asks for list of lists [bool, "name" or None]
+    prompt_names = pr_names.prompt_file_name  # asks for list of lists [bool, "name" or None]
     chain = LLMChain(llm=llm, prompt=prompt_names)
     inputs = []
     for file in files :
