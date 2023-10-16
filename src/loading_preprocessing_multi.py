@@ -1,4 +1,5 @@
 import os
+import utils
 import pandas as pd
 from langchain.document_loaders import PyPDFDirectoryLoader  # tt un dossier, ms mm pb que PyPDFLoader
 from langchain.document_loaders import PyPDFLoader  # probleme d'espaces intempestifs
@@ -10,7 +11,7 @@ def list_of_files(data_dir) :
 
 def list_of_files_as_str(data_dir) :
     joint = ', ' + data_dir
-    return data_dir+joint.join(list_of_files(data_dir))
+    return data_dir + joint.join(list_of_files(data_dir))
 
 def load_files(data_dir, persist_directory=None, loader_method='PyMuPDFLoader') :
     loader_method = eval(loader_method)
@@ -20,10 +21,10 @@ def load_files(data_dir, persist_directory=None, loader_method='PyMuPDFLoader') 
         vectors = []
     else :
         try :
-            vectors = os.listdir(persist_directory)
+            vectors = utils.list_of_files(persist_directory)
         except FileNotFoundError : # probably a first run, directory not created yet
             vectors = []
-    if len(vectors) == 0 :  # remplissage initial de la data base
+    if len(vectors) == 0 :  # initial filling of database
         loaders = []
         for f in files :
             loaders.append(loader_method(data_dir+f))
@@ -33,8 +34,8 @@ def load_files(data_dir, persist_directory=None, loader_method='PyMuPDFLoader') 
     return docs, len(files)  # all pages, nb_files
 
 def load_files_all_at_once(data_dir, persist_directory) :
-    vectors = os.listdir(persist_directory) # pour tester si c'est vide ou pas
-    if len(vectors) == 0 :  # remplissage initial de la data base
+    vectors = utils.list_of_files(persist_directory) # to check if empty
+    if len(vectors) == 0 :  # initial filling of database
         loader = PyPDFDirectoryLoader(data_dir)
         docs = loader.load()
     else :

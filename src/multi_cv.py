@@ -8,6 +8,7 @@ from langchain.chains.query_constructor.base import AttributeInfo
 from langchain.prompts import PromptTemplate
 # my modules 
 import loading_preprocessing_multi
+import load_pdf
 import vectorstore_lib
 import prompts.prompt_multi_cv as pr_multi
 import call_to_llm
@@ -54,10 +55,10 @@ if len(sys.argv) > 1 and sys.argv[1] == 'clean' :
     subprocess.run('rm -rf ' + persist_directory + '*', shell=True)
 
 ## Vectorstore creation
-docs, nb_files = loading_preprocessing_multi.load_files(data_dir, 
-                                                        persist_directory=persist_directory, 
-                                                        loader_method=loader_method
-                                                        )
+docs, nb_files = load_pdf.load_files(data_dir, 
+                                    persist_directory=persist_directory, 
+                                    loader_method=loader_method
+                                    )
 vectordb, list_of_names_as_str = vectorstore_lib.create_vector_db(docs, 
                                                                   data_dir, 
                                                                   splitter, 
