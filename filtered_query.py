@@ -3,7 +3,6 @@ from langchain.chains import LLMChain
 import prompt_single_cv
 import prompt_extract_names
 import prompt_format_name
-import prompt_interrogate_field
 import treat_query
 
 def ask_filtered_query(dict_db, question, list_of_names, list_of_fields, llm='default') :

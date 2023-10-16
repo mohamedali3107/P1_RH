@@ -3,8 +3,7 @@ from langchain.chains import LLMChain
 # my modules
 import prompt_single_cv
 
-data_dir = 'data/' # todo : faire en sorte que pas besoin
-
+#data_dir = 'data/' # todo : faire en sorte que pas besoin
 # def list_of_outputs_from_vectorstore(vectordb, metadata_ids, query_multi, llm='default') :
 #     if llm == 'default' :
 #         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
@@ -25,7 +24,7 @@ data_dir = 'data/' # todo : faire en sorte que pas besoin
 #         res[meta] = output
 #     return res
 
-def outputs_from_dict(dict_db, question, fields, chain='default', llm='default') :
+def outputs_from_dict(dict_db, question, fields, chain='default', llm='default', verbose=False) :
     if llm == 'default' :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
     if chain == 'default' :
@@ -38,5 +37,6 @@ def outputs_from_dict(dict_db, question, fields, chain='default', llm='default')
             data.append(dict_db[field][meta])
         output = chain.predict(topic=fields, data=data, question=question) # lists
         outputs[meta] = output
-        #print('output for', meta, 'on field value', dict_db[field][meta], ':', output)
+        if verbose :
+            print('Output of LLM for', meta, 'on field values', data, ':', output)
     return outputs

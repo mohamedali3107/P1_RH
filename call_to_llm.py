@@ -82,12 +82,15 @@ def create_context_from_dict(dict_db, field) :
     return context
 
 def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', llm='default') :
-    fields_as_list = treat_query.extract_target_fields(query_multi, list_of_fields, llm=llm)
-    print('detected field(s) :', fields_as_list)
+    try :
+        fields_involved = treat_query.extract_target_fields(query_multi, list_of_fields, llm=llm)
+    except Exception as err :
+        print(*err.args)
+        fields_involved = ['unknown']  # todo : plutôt [] mais à gérer dans fonctions appelées
     operation = treat_query.detect_operation_from_query(query_multi, llm=llm)
     if operation == 'Condition' or operation == 'Comparison' :
         mono_query = treat_query.multi_to_mono(query_multi)
-        outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, fields_as_list, chain=chain, llm=llm)
+        outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, fields_involved, chain=chain, llm=llm)
         selected_candidates = []
         for meta in outputs :
             if outputs[meta] == 'Yes' :
@@ -97,7 +100,7 @@ def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', ll
         return ", ".join(selected_candidates)
     elif operation == 'All' :
         mono_query = treat_query.multi_to_mono(query_multi)
-        outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, fields_as_list, chain=chain, llm=llm)
+        outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, fields_involved, chain=chain, llm=llm)
         global_output = ""
         for meta in outputs :
             global_output += meta + ' : ' + outputs[meta] + '\n'
@@ -109,7 +112,11 @@ def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', ll
 def ask_question_dict(dict_db, csv_file, all_loaded, question, chain='default', llm='default') :
     '''Assumes all CVs to study have been loaded (ideally does not assume all fields and loads missing, todo)'''
     list_of_fields = loading_preprocessing_multi.list_of_fields_csv(csv_file)
-    mode = treat_query.detect_query_type(question, llm=llm)
+    try :
+        mode = treat_query.detect_query_mode(question, llm=llm)
+    except Exception as err :
+        print(*err.args)
+        mode = 'unknown'
     if mode == 'transverse' :
         return ask_question_multi(dict_db, question, list_of_fields, chain=chain, llm=llm)
     elif mode == 'single' :
@@ -117,15 +124,13 @@ def ask_question_dict(dict_db, csv_file, all_loaded, question, chain='default', 
         list_of_names = list(all_loaded.values())
         return filtered_query.ask_filtered_query(dict_db, question, list_of_names, list_of_fields, llm=llm)
     else :
-        print('Mode transverse/single unclear')
-    return ''
+        return('Mode transverse/single unclear')
     
 def test_question_dico() :
     csv_file = loading_preprocessing_multi.load_csv("data_template_concise_no_double.csv")
     dict_db = {}
     loaded = {}
     loading_preprocessing_multi.load_full_csv_to_dict(csv_file, dict_db, loaded)
-    #fields = loading_preprocessing_multi.list_of_fields_csv(csv_file)
     print(list(loaded.values()))
     question = input("query ? ")
     res = ask_question_dict(dict_db, csv_file, loaded, question, chain='default', llm='default')
