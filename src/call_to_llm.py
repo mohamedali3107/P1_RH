@@ -5,7 +5,7 @@ import filtered_query
 #import loading_preprocessing_multi
 import loading.load_from_csv as load_from_csv
 
-def create_context_from_chunks(docs) :
+def create_context_from_chunks(docs : list) :
     '''Concatenate the content of retrieved documents as a context to be fed to the llm
     Input: a list of documents
     Output: a string
@@ -29,7 +29,7 @@ def create_context_from_chunks(docs) :
 def create_chain(llm, prompt) :  # le retrieving sera fait manuellement pour le 'context' du prompt
     return LLMChain(llm=llm, prompt=prompt)
 
-def print_chunks(chunks, with_scores=True) :
+def print_chunks(chunks : list, with_scores : bool = True) :
     if with_scores :
         try :  # doc = tuple (document, score)
             i = 1
@@ -59,7 +59,7 @@ def get_result(chain, sources, question, print_source_docs=True, print_scores=Tr
         inputs = [{"context" : context, "question" : question}]
         return chain.apply(inputs)  # list of results [{'text': '...'},...]
 
-def print_multi_result(inputs, results, print_context=False) :
+def print_multi_result(inputs, results, print_context : bool =False) :
     '''Input : 
             inputs  : (list of) dictionaries having a 'question' key
             results : (list of) results [{'text': '...'},...]
@@ -75,7 +75,7 @@ def print_multi_result(inputs, results, print_context=False) :
 
 ######## On structured CVs #########
 
-def create_context_from_dict(dict_db, field) :
+def create_context_from_dict(dict_db : dict, field : str) :
     '''Just in case (typically for non quantitative questions)'''
     context = field + ' of candidates : \n\n'
     for meta in dict_db[field] :

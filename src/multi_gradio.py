@@ -119,7 +119,7 @@ demoGradioQA_MultipleCV = gr.Interface(
 
 ########## QA V1 (FROM THE FILLED CSV) ##########
 
-def fn_gradio_QA_from_csv(question):
+def fn_gradio_QA_from_csv(question : str):
     """Double pdfs should be removed from the data folder"""
     fill_template.fill_whole_template(fill_template.template_path, fill_template.complete_paths, print_time=False, force_refill=False)
     csv_file = load_from_csv.load_csv(fill_template.template_path)
