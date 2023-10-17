@@ -2,7 +2,8 @@ from langchain.chains import LLMChain
 import treat_query
 import manage_transversal_query
 import filtered_query
-import loading_preprocessing_multi
+#import loading_preprocessing_multi
+import loading.load_from_csv as load_from_csv
 
 def create_context_from_chunks(docs) :
     '''Concatenate the content of retrieved documents as a context to be fed to the llm
@@ -111,7 +112,7 @@ def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', ll
 
 def ask_question_dict(dict_db, csv_file, all_loaded, question, chain='default', llm='default') :
     '''Assumes all CVs to study have been loaded (ideally does not assume all fields and loads missing, todo)'''
-    list_of_fields = loading_preprocessing_multi.list_of_fields_csv(csv_file)
+    list_of_fields = load_from_csv.list_of_fields_csv(csv_file)
     try :
         mode = treat_query.detect_query_mode(question, llm=llm)
     except Exception as err :
@@ -127,10 +128,10 @@ def ask_question_dict(dict_db, csv_file, all_loaded, question, chain='default', 
         return('Mode transverse/single unclear')
     
 def test_question_dico() :
-    csv_file = loading_preprocessing_multi.load_csv("data_template_concise_no_double.csv")
+    csv_file = load_from_csv.load_csv("data_template_concise_no_double.csv")
     dict_db = {}
     loaded = {}
-    loading_preprocessing_multi.load_full_csv_to_dict(csv_file, dict_db, loaded)
+    load_from_csv.load_full_csv_to_dict(csv_file, dict_db, loaded)
     print(list(loaded.values()))
     question = input("query ? ")
     res = ask_question_dict(dict_db, csv_file, loaded, question, chain='default', llm='default')

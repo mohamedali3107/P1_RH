@@ -8,12 +8,15 @@ from langchain.chains.query_constructor.base import AttributeInfo
 import gradio as gr
 from itertools import chain as chain_list
 # my modules 
-import loading_preprocessing_multi
+#import loading_preprocessing_multi
 import vectorstore_lib
 import prompts.prompt_multi_cv as pr_multi
 import call_to_llm
 import gradio_lib
 import fill_template
+import loading.load_from_csv as load_from_csv
+import loading.load_pdf as load_pdf
+import loading.utils as utils
 
 import os
 import openai
@@ -59,7 +62,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'clean' :
     subprocess.run('rm -rf ' + persist_directory + '*', shell=True)
 
 ## Vectorstore creation
-docs, nb_files = loading_preprocessing_multi.load_files(data_dir, 
+docs, nb_files = load_pdf.load_files(data_dir, 
                                                         persist_directory=persist_directory, 
                                                         loader_method=loader_method
                                                         )
@@ -74,7 +77,7 @@ vectordb, list_of_names_as_str = vectorstore_lib.create_vector_db(docs,
 metadata_field_info = [
     AttributeInfo(
         name="source",
-        description="The source CV the document is from, should be one of " + loading_preprocessing_multi.list_of_files_as_str(data_dir),
+        description="The source CV the document is from, should be one of " + utils.list_of_files_as_str(data_dir),
         type="string",
      ),
     AttributeInfo(
@@ -119,10 +122,10 @@ demoGradioQA_MultipleCV = gr.Interface(
 def fn_gradio_QA_from_csv(question):
     """Double pdfs should be removed from the data folder"""
     fill_template.fill_whole_template(fill_template.template_path, fill_template.complete_paths, print_time=False, force_refill=False)
-    csv_file = loading_preprocessing_multi.load_csv(fill_template.template_path)
+    csv_file = load_from_csv.load_csv(fill_template.template_path)
     dict_db = {}
     loaded = {}
-    loading_preprocessing_multi.load_full_csv_to_dict(csv_file, dict_db, loaded)
+    load_from_csv.load_full_csv_to_dict(csv_file, dict_db, loaded)
     return call_to_llm.ask_question_dict(dict_db, csv_file, loaded, question, chain='default', llm='default')
 
 demo_questions = [
