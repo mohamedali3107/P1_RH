@@ -1,6 +1,7 @@
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
-import loading_preprocessing_multi
+import loading.load_pdf as load_pdf
+import loading.utils
 import prompts.prompt_extract_names as pr_names
 import os
 import openai
@@ -12,7 +13,7 @@ def add_name_as_metadata(docs, data_dir, llm='default') :
     if llm == 'default' :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
     list_of_names_as_str = ""
-    files = loading_preprocessing_multi.list_of_files(data_dir)
+    files = loading.utils.list_of_files(data_dir)
     prompt_names = pr_names.prompt_file_name  # asks for list of lists [bool, "name" or None]
     chain = LLMChain(llm=llm, prompt=prompt_names)
     inputs = []
@@ -51,7 +52,7 @@ def add_name_as_metadata(docs, data_dir, llm='default') :
 def find_name_in_CV(doc, llm='default') :
     if llm == 'default' :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
-    prompt_name_in_text = prompt_extract_names.prompt_name_in_text  # asks for list of lists [bool, "name" or None]
+    prompt_name_in_text = pr_names.prompt_name_in_text  # asks for list of lists [bool, "name" or None]
     chain = LLMChain(llm=llm, prompt=prompt_name_in_text)
     context = doc.page_content
     if len(context) >= 2000 :
