@@ -13,8 +13,8 @@ import getpass
 import sql_queries as sql
 import loading.load_pdf as load_pdf
 import loading.load_from_csv as load_csv
+import prompts.prompt_languages as pr_languages
 
-from langchain.document_loaders import PyMuPDFLoader
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -37,18 +37,10 @@ splitter = RecursiveCharacterTextSplitter(
     separators=["\n\n", "\n", " ", ""]
 )
 embedding = OpenAIEmbeddings()
-llm_name = 'gpt-3.5-turbo'
-llm = ChatOpenAI(model_name=llm_name, temperature=0)
+llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
 
-def add_one_cv(db_cursor, doc, table_prompts, force_refill=False, save=True, verbose=False):  
-    # todo : plutôt prendre un doc déja loadé par un fichier de loading appelé depuis fill_whole_template
-    """
-    Inputs:
-        ...
-    """
-
+def add_one_cv(db_cursor, doc, table_prompts, force_refill=False, save=True, verbose=False): 
     fields = list(table_prompts) 
-
     # if already loaded and not force_refill, print and return accordingly
     if False :
         return
@@ -61,35 +53,56 @@ def add_one_cv(db_cursor, doc, table_prompts, force_refill=False, save=True, ver
         subprocess.run('rm -rf ' + persist_directory, shell=True)
         chunks = vectorstore_lib.splitting_of_docs(doc, splitter)
         vectordb = vectorstore_lib.new_vectordb(chunks, 
-                                embedding, 
+                                embedding,
                                 persist_directory
         )
         retriever_obj = vectordb
-
-        for field in fields[1:]:    # Omitting the first field (=filename)
-            ## Prepare chain with prompt template
-            prompt_template = prompts_df[field][0]
-            prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
-            chain = call_to_llm.create_chain(llm, prompt)
-
-            ## Retrieving and calling the LLM
-            sources = vectorstore_lib.retrieving(retriever_obj, field, retriever_type="vectordb", with_scores=True)
-            context = call_to_llm.create_context_from_chunks(sources)
-            answer = chain.predict(context=context, field=field)
-            data.append(answer)
-            if verbose:
-                print(f"Filling the {field}... Here are the retrieved chunks with scores: \n\n")
-                call_to_llm.print_chunks(sources)
-                print(data)
-        if save:  # todo : use mysql connector to update the database
-            # if file in template_df["Filename"].unique():
-            #     template_df.loc[template_df["Filename"] == file] = data
-            # else:
-            #     new_row = pd.DataFrame(columns=fields, data=[data])
-            #     template_df = pd.concat([template_df, new_row], ignore_index=True)
-            #     template_df.to_csv(template_path, index=False)
-            print("to implement")
+        # todo : call to axiliary functions
+        add_one_cv_language(db_cursor, retriever_obj, retriever_type="vectordb", save=True)
         return data
+    
+def format_languages(spoken_languages_str): # format the output of the llm
+    # todo : implement depending of llm answer shape
+    # eval(spoken_languages_str)
+    return [("lang1", "niv1"), ("lang2, niv2")]
+
+def get_table_entry(retriever_obj, prompt, retriever_type="vectordb", llm='default'):  # retrieving et llm
+    if llm == 'default' :
+        llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
+
+def add_one_cv_language(db_cursor, retriever_obj, retriever_type="vectordb", force_refill=False, save=True, verbose=False):
+    ## Prepare chain with prompt template
+    prompt_template = prompt_languages.template
+    prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
+    chain = call_to_llm.create_chain(llm, prompt)
+
+    ## Retrieving and calling the LLM
+    question = "what is said about languages ?"
+    sources = vectorstore_lib.retrieving(retriever_obj, question, retriever_type="vectordb", with_scores=True)
+    context = call_to_llm.create_context_from_chunks(sources)
+    answer = chain.predict(context=context)
+    languages_with_level = format_languages(answer)
+    if verbose:
+        print(f"Filling the languages information... Here are the retrieved chunks with scores: \n\n")
+        call_to_llm.print_chunks(sources)
+        print(answer, "\n")
+    if save:
+        db_cursor.execute("SELECT NameLanguage FROM languages")
+        known_languages = db_cursor.fetchall()
+        for lang in languages_with_level:
+            if lang not in known_languages:
+                db_cursor.execute(f"""INSERT INTO languages (NameLanguage) 
+                                  VALUES ('{lang}');""")
+                
+        # todo : use mysql connector to update the database
+        # if file in template_df["Filename"].unique():
+        #     template_df.loc[template_df["Filename"] == file] = data
+        # else:
+        #     new_row = pd.DataFrame(columns=fields, data=[data])
+        #     template_df = pd.concat([template_df, new_row], ignore_index=True)
+        #     template_df.to_csv(template_path, index=False)
+        print("to implement")
+    return
 
 def fill_database(cursor, docs, table_prompts, print_time=True, force_refill=False):
     t0 = time.time()
@@ -101,7 +114,7 @@ def fill_database(cursor, docs, table_prompts, print_time=True, force_refill=Fal
     if print_time:
         print("Time to fill the database with new CVs : {:.2f}s".format(time.time()-t0))
 
-def initiate_database(database, verbose=True):
+def initialize_database(database, verbose=True):
     cursor = database.cursor()
     db_name = 'candidates_cv'
     # check if the database already exists
@@ -137,7 +150,7 @@ if __name__ == "__main__":
         password=password,
     )
     cursor = mydb.cursor()
-    initiate_database(mydb)
+    initialize_database(mydb)
     prompts_df = load_csv.load_csv(table_prompts_path)
     docs = load_pdf.load_files(data_dir, persist_directory=persist_directory, loader_method='PyMuPDFLoader')
 

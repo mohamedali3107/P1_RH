@@ -14,7 +14,7 @@ Country varchar(30)
 
 create_languages = """
 CREATE TABLE IF NOT EXISTS languages (
-Name varchar(30) primary key
+NameLanguage varchar(30) primary key
 );
 """
 
