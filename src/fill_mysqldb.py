@@ -14,6 +14,7 @@ import sql_queries as sql
 import loading.load_pdf as load_pdf
 import loading.load_from_csv as load_csv
 import prompts.prompt_languages as pr_languages
+import prompts.prompt_candidates as pr_candidates
 
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -39,15 +40,19 @@ splitter = RecursiveCharacterTextSplitter(
 embedding = OpenAIEmbeddings()
 llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
 
-def add_one_cv(db_cursor, doc, table_prompts, force_refill=False, save=True, verbose=False): 
-    fields = list(table_prompts) 
+def add_one_cv(db_cursor, doc, force_refill=False, save=True, verbose=False):
     # if already loaded and not force_refill, print and return accordingly
     if False :
         return
     else:
+        filename = doc.metadata['source']
         if verbose:
-            print("Filling the template for " + doc.metadata['source'] + "...\n")
-        data = [doc.metadata['source']] # First field is the filename
+            print("Filling the database with " + filename + "...\n")
+        db_cursor.execute("SELECT NameFile FROM candidates")
+        known_files = db_cursor.fetchall()
+        if filename in known_files :
+            print("CV already parsed.")
+            return
 
         ## Vectorstore and retriever creation
         subprocess.run('rm -rf ' + persist_directory, shell=True)
@@ -57,13 +62,14 @@ def add_one_cv(db_cursor, doc, table_prompts, force_refill=False, save=True, ver
                                 persist_directory
         )
         retriever_obj = vectordb
-        # todo : call to axiliary functions
+        # todo : call to auxiliary functions
+        add_one_cv_candidate(db_cursor, filename, retriever_obj, retriever_type="vectordb", force_refill=force_refill, save=True, verbose=verbose)
+        # ...
         add_one_cv_language(db_cursor, retriever_obj, retriever_type="vectordb", save=True)
-        return data
     
 def format_languages(spoken_languages_str): # format the output of the llm
     # todo : implement depending of llm answer shape
-    # eval(spoken_languages_str)
+    # eval(spoken_languages_str)   # <- typically, if already well formated by the llm
     return [("lang1", "niv1"), ("lang2, niv2")]
 
 def get_table_entry(retriever_obj, prompt, retriever_type="vectordb", llm='default'):  # retrieving et llm
@@ -72,7 +78,7 @@ def get_table_entry(retriever_obj, prompt, retriever_type="vectordb", llm='defau
 
 def add_one_cv_language(db_cursor, retriever_obj, retriever_type="vectordb", force_refill=False, save=True, verbose=False):
     ## Prepare chain with prompt template
-    prompt_template = prompt_languages.template
+    prompt_template = pr_languages.template
     prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
     chain = call_to_llm.create_chain(llm, prompt)
 
@@ -94,13 +100,30 @@ def add_one_cv_language(db_cursor, retriever_obj, retriever_type="vectordb", for
                 db_cursor.execute(f"""INSERT INTO languages (NameLanguage) 
                                   VALUES ('{lang}');""")
                 
-        # todo : use mysql connector to update the database
-        # if file in template_df["Filename"].unique():
-        #     template_df.loc[template_df["Filename"] == file] = data
-        # else:
-        #     new_row = pd.DataFrame(columns=fields, data=[data])
-        #     template_df = pd.concat([template_df, new_row], ignore_index=True)
-        #     template_df.to_csv(template_path, index=False)
+        # todo : fill the speaks table
+        print("to implement")
+    return
+
+def add_one_cv_candidate(db_cursor, filename, retriever_obj, retriever_type="vectordb", force_refill=False, save=True, verbose=False):
+    data = [filename]
+    prompts_candidates = pr_candidates.dict  # dictionary of prompts to fill candidates
+
+    for field in prompts_candidates :  # field must be exactly the name of an attribute
+        prompt_template = prompts_candidates[field]
+        prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
+        chain = call_to_llm.create_chain(llm, prompt)
+
+        ## Retrieving and calling the LLM
+        sources = vectorstore_lib.retrieving(retriever_obj, field, retriever_type="vectordb", with_scores=True)
+        context = call_to_llm.create_context_from_chunks(sources)
+        answer = chain.predict(context=context)
+        if verbose:
+            print(f"Filling the {field} information... Here are the retrieved chunks with scores: \n\n")
+            call_to_llm.print_chunks(sources)
+            print(answer, "\n")
+                
+        # todo : fill the candidate table with each attribute (each field)
+        # INSERT INTO customers (customer_name, email, address) VALUES ('John Doe', 'johndoe@example.com', '123 Main St');
         print("to implement")
     return
 
