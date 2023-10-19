@@ -3,10 +3,11 @@ from langchain.chat_models import ChatOpenAI
 import sys
 sys.path.append('prompts/')
 import prompts.prompt_mono_from_multi
-import prompts.prompt_interrogate_field
-import prompts.prompt_detect_mode
-import prompts.prompt_extract_names
-import prompts.prompt_format_name
+import prompts.prompt_interrogate_field as prompt_interrogate_field
+import prompts.prompt_detect_mode as prompt_detect_mode
+import prompts.prompt_extract_names as prompt_extract_names
+import prompts.prompt_format_name as prompt_format_name
+import prompts.prompt_mono_from_multi as prompt_mono_from_multi
 
 def multi_to_mono(query_multi, llm='default', verbose=False) :
     '''Turn a question on all CV's into an individual question to be run on each CV'''
