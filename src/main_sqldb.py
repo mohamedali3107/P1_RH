@@ -1,24 +1,13 @@
-import subprocess
-import sys
 from langchain.text_splitter import RecursiveCharacterTextSplitter #TokenTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
-from langchain.retrievers.self_query.base import SelfQueryRetriever
-from langchain.chains.query_constructor.base import AttributeInfo
 # my modules 
-#import loading_preprocessing_multi
-import vectorstore_lib
-import prompts.prompt_multi_cv as pr_multi
-import call_to_llm
 import loading.load_pdf as load_pdf
 import loading.utils as utils
 import getpass
-import sql_queries as sql
 import mysql.connector
 import fill_mysqldb as fill
 import loading.load_pdf as load_pdf
-import prompts.prompt_languages as pr_languages
-import prompts.prompt_candidates as pr_candidates
 import call_llm_on_db
 
 import os
@@ -42,8 +31,6 @@ all_fields = ["FileName"
 ]
 
 list_of_names = ["Leo SOUQUET", "Justine Falque", "Robert VESOUL", "Aymeric Bernard"]
-
-########## QA V0 (FROM THE DOCS) ##########
 
 ########## Parameters ##########
 

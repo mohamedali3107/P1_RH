@@ -2,7 +2,6 @@ from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 import sys
 sys.path.append('prompts/')
-import prompts.prompt_mono_from_multi
 import prompts.prompt_interrogate_field as prompt_interrogate_field
 import prompts.prompt_detect_mode as prompt_detect_mode
 import prompts.prompt_extract_names as prompt_extract_names

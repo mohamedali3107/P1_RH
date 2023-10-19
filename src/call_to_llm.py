@@ -4,45 +4,12 @@ import manage_transversal_query
 import filtered_query
 #import loading_preprocessing_multi
 import loading.load_from_csv as load_from_csv
-
-def create_context_from_chunks(docs : list) :
-    '''Concatenate the content of retrieved documents as a context to be fed to the llm
-    Input: a list of documents
-    Output: a string
-    '''
-    context = ""
-    if len(docs) != 0 :
-        i = 1
-        if type(docs[0]) == tuple :  # case if scores have been attached (doc[1]=score)
-            for doc in docs :
-                context += "[ [source " + str(i) + " from " + doc[0].metadata['source'] + "] ] :  " + doc[0].page_content + "\n\n"
-                i += 1
-                # todo : idéalement ce serait mieux d'indiquer les noms que la source
-        else :  # without scores, docs = list of documents
-            for doc in docs :
-                context += "[ [source " + str(i) + " from " + doc.metadata['source'] + "] ]   " + doc.page_content + "\n\n"
-                i += 1
-    else :
-        print("No information retreived, vector data base could be empty or need recomputing.")
-    return context
+import treat_chunks
 
 def create_chain(llm, prompt) :  # le retrieving sera fait manuellement pour le 'context' du prompt
     return LLMChain(llm=llm, prompt=prompt)
 
-def print_chunks(chunks : list, with_scores : bool = True) :
-    if with_scores :
-        try :  # doc = tuple (document, score)
-            i = 1
-            for doc in chunks :
-                print("[ [source", i, "from " + doc[0].metadata['source'] + "] ] :  " + doc[0].page_content,"\nscore :", round(1-doc[1], 4), "\n")  # higher is better
-                i += 1
-        except TypeError :  # en fait on n'a pas calculé les scores donc doc est juste un Document
-            print("No scores computed with this retrieving method.")
-            print(create_context_from_chunks(chunks))  # sans scores
-    else :
-        print(create_context_from_chunks(chunks))
-
-def get_result(chain, sources, question, print_source_docs=True, print_scores=True, multi_inputs=False) :
+def get_result(chain, chunks, question, print_source_docs=True, print_scores=True, multi_inputs=False) :
     '''Call the llm on retrieved chunks with the provided question.
     Options to print source chunks and scores.
     Scores will only be printed if they were provided with the source chunks (as an output of the retriever)
@@ -50,8 +17,8 @@ def get_result(chain, sources, question, print_source_docs=True, print_scores=Tr
     Output: string, or list of results [{'text': '...'},...] if multi_inputs
     '''
     if print_source_docs :
-        print_chunks(sources, with_scores=print_scores)
-    context = create_context_from_chunks(sources)
+        treat_chunks.print_chunks(chunks, with_scores=print_scores)
+    context = treat_chunks.create_context_from_chunks(chunks)
     # partie affichage avec les arguments optionnels
     if not multi_inputs :
         return chain.predict(context=context, question=question)
@@ -110,9 +77,11 @@ def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', ll
         print('Type of tranversal question not supported yet')
         return ''
 
-def ask_question_dict(dict_db, csv_file, all_loaded, question, chain='default', llm='default') :
+def ask_question(dict_db, csv_file, all_loaded, question, chain='default', llm='default') :
     '''Assumes all CVs to study have been loaded (ideally does not assume all fields and loads missing, todo)'''
+    print("call to ask_question")
     list_of_fields = load_from_csv.list_of_fields_csv(csv_file)
+    print("fields recovered")
     try :
         mode = treat_query.detect_query_mode(question, llm=llm)
     except Exception as err :
@@ -134,5 +103,5 @@ def test_question_dico() :
     load_from_csv.load_full_csv_to_dict(csv_file, dict_db, loaded)
     print(list(loaded.values()))
     question = input("query ? ")
-    res = ask_question_dict(dict_db, csv_file, loaded, question, chain='default', llm='default')
+    res = ask_question(dict_db, csv_file, loaded, question, chain='default', llm='default')
     print(res)

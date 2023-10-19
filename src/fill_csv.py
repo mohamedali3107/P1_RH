@@ -3,10 +3,10 @@ import openai
 from dotenv import load_dotenv, find_dotenv
 import pandas as pd
 import subprocess
-import gradio as gr
 import time
 import vectorstore_lib
 import call_to_llm
+import treat_chunks
 
 from langchain.document_loaders import PyMuPDFLoader
 from langchain.chat_models import ChatOpenAI
@@ -57,9 +57,10 @@ def fill_one_row(template_path, file, force_refill, save=False, verbose=False):
     
     else:
         if verbose:
-            print("Filling the template for " + file + "...\n")
+            print("\nFilling the template for " + file + "...\n")
         loader = PyMuPDFLoader(file)
         cv = loader.load()
+        print("File loaded")
         data = [file] # First field is the filename
 
         ## Vectorstore and retriever creation
@@ -70,6 +71,7 @@ def fill_one_row(template_path, file, force_refill, save=False, verbose=False):
                                 persist_directory
         )
         retriever_obj = vectordb
+        print("Vectorstore created")
 
         for field in fields[1:]:    # Omitting the first field (=filename)
 
@@ -80,12 +82,13 @@ def fill_one_row(template_path, file, force_refill, save=False, verbose=False):
 
             ## Retrieving and calling the LLM
             sources = vectorstore_lib.retrieving(retriever_obj, field, retriever_type="vectordb", with_scores=True)
-            context = call_to_llm.create_context_from_chunks(sources)
+            context = treat_chunks.create_context_from_chunks(sources)
             answer = chain.predict(context=context, field=field)
+            print("Piece of data :", answer)
             data.append(answer)
             if verbose:
                 print(f"Filling the {field}... Here are the retrieved chunks with scores: \n\n")
-                call_to_llm.print_chunks(sources)
+                treat_chunks.print_chunks(sources)
                 print(data)
         if save:
             if file in template_df["Filename"].unique():

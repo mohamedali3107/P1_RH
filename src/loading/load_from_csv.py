@@ -9,13 +9,14 @@ def list_of_fields_csv(csv_file) :
 def labels_from_csv(csv_file, label_field="Filename") :
     return list(csv_file[label_field].values)
 
-def load_field_data_from_csv(csv_file, label, field) :
+def load_field_data_from_csv(csv_file, label, field, caller=None) :
     '''Read a specified value in a csv'''
     table = csv_file[csv_file["Filename"]==label][field].values # should contain only one value
     try :
         return table[0]
     except IndexError :
-        print("Error : association file name / field does not exist")
+        print("label:", label, ";  field:", field, ";  called_from:", caller)
+        #print("Error : association file name / field does not exist")
         return ""
 
 def meta_of_file_from_csv(csv_file, label) :
@@ -47,7 +48,7 @@ def update_dict_with_field_from_csv(dict_db, csv_file, field, all_loaded_CV) :
         else :
             meta = meta_of_file_from_csv(csv_file, label)
             all_loaded_CV[label] = meta
-        value = load_field_data_from_csv(csv_file, label, field)
+        value = load_field_data_from_csv(csv_file, label, field, caller="update...field")
         update_dict_with_field_value(dict_db, field, value, meta)
         update_pool_loaded_CV(all_loaded_CV, label, meta)
 
@@ -77,7 +78,7 @@ def update_dict_with_CV(dict_db, label, csv_file, all_loaded_CV, full=False) :
     else :
         list_of_fields = list_of_fields_csv(csv_file)
         for field in list_of_fields :
-            data = load_field_data_from_csv(csv_file, label, field)
+            data = load_field_data_from_csv(csv_file, label, field, caller="update...CV")
             update_dict_with_field_value(dict_db, field, data, meta)
     update_pool_loaded_CV(all_loaded_CV, label, meta)
 
@@ -92,6 +93,7 @@ def update_dict_from_csv(dict_db, csv_file, all_loaded_CV, full=False) :
 
 def load_full_csv_to_dict(csv_file, dict_db, all_loaded_CV) :
     labels = labels_from_csv(csv_file)
+    print("labels :", labels)
     for label in labels :
         update_dict_with_CV(dict_db, label, csv_file, all_loaded_CV, full=True)
         meta = meta_of_file_from_csv(csv_file, label)

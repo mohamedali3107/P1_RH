@@ -190,7 +190,7 @@ if __name__ == "__main__":
     for doc in docs:
         add_one_cv(cursor, doc, verbose=True)
         mydb.commit()
-    cursor.execute("SELECT FirstName, FamilyName, PhoneNumber, Email FROM candidates")
+    cursor.execute("SELECT FirstName, FamilyName, PhoneNumber, Email FROM candidates;")
     extract = cursor.fetchall()
     for entry in extract :
         print(*entry)
