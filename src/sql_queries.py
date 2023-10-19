@@ -1,14 +1,16 @@
 
 create_candidates = """
 CREATE TABLE IF NOT EXISTS candidates (
-FileName varchar(30) primary key,
-FirstName varchar(30),
+FileName varchar(50) primary key,
+FirstName varchar(40),
 FamilyName varchar(40),
+Gender varchar(20),
 Email varchar(30),
-PhoneNumber varchar(15),
-LinkedIn varchar(30),
+PhoneNumber varchar(25),
+LinkedIn varchar(40),
 Webpage varchar(40),
-Country varchar(30)
+Country varchar(30),
+City varchar(30)
 );
 """
 

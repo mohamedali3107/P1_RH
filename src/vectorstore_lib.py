@@ -31,7 +31,7 @@ def create_vector_db(docs, data_dir, splitter, embedding, persist_directory, enr
         metadatas = vectordb.get(include=['metadatas'])['metadatas']
         if len(metadatas) == 0 :
             print('No metadata in the pre-indexed documents. Check this out')
-        elif 'name' in metadatas[0] : # il y avait des noms dans les metadonnees
+        elif 'name' in metadatas[0] and enrich_with_name : # il y avait des noms dans les metadonnees
             for doc_meta in metadatas :
                 name = doc_meta['name']
                 if name not in list_of_names :

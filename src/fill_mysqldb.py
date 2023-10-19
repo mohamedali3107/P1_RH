@@ -41,22 +41,24 @@ embedding = OpenAIEmbeddings()
 llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
 
 def add_one_cv(db_cursor, doc, force_refill=False, save=True, verbose=False):
-    # if already loaded and not force_refill, print and return accordingly
+    # todo : if already loaded and not force_refill, print and return accordingly
     if False :
         return
     else:
         filename = doc.metadata['source']
         if verbose:
-            print("Filling the database with " + filename + "...\n")
+            print("\nFilling the database with " + filename + "...\n")
         db_cursor.execute("SELECT FileName FROM candidates")
         known_files = db_cursor.fetchall()
+        known_files = [file[0] for file in known_files]
+        print("known :", known_files)
         if filename in known_files :
             print("CV already parsed.")
             return
 
         ## Vectorstore and retriever creation
         subprocess.run('rm -rf ' + persist_directory, shell=True)
-        chunks = vectorstore_lib.splitting_of_docs(doc, splitter)
+        chunks = vectorstore_lib.splitting_of_docs([doc], splitter)
         vectordb = vectorstore_lib.new_vectordb(chunks, 
                                 embedding,
                                 persist_directory
@@ -65,7 +67,7 @@ def add_one_cv(db_cursor, doc, force_refill=False, save=True, verbose=False):
         # todo : call to auxiliary functions
         add_one_cv_candidate(db_cursor, filename, retriever_obj, retriever_type="vectordb", force_refill=force_refill, save=True, verbose=verbose)
         # ...
-        add_one_cv_language(db_cursor, retriever_obj, retriever_type="vectordb", save=True)
+        #add_one_cv_language(db_cursor, retriever_obj, retriever_type="vectordb", save=True)
     
 def format_languages(spoken_languages_str): # format the output of the llm
     # todo : implement depending of llm answer shape
@@ -83,8 +85,7 @@ def add_one_cv_language(db_cursor, retriever_obj, retriever_type="vectordb", for
     chain = call_to_llm.create_chain(llm, prompt)
 
     ## Retrieving and calling the LLM
-    question = "what is said about languages ?"
-    sources = vectorstore_lib.retrieving(retriever_obj, question, retriever_type="vectordb", with_scores=True)
+    sources = vectorstore_lib.retrieving(retriever_obj, "languages", retriever_type="vectordb", with_scores=True)
     context = call_to_llm.create_context_from_chunks(sources)
     answer = chain.predict(context=context)
     languages_with_level = format_languages(answer)
@@ -105,26 +106,34 @@ def add_one_cv_language(db_cursor, retriever_obj, retriever_type="vectordb", for
     return
 
 def add_one_cv_candidate(db_cursor, filename, retriever_obj, retriever_type="vectordb", force_refill=False, save=True, verbose=False):
-    data = [filename]
+    data = {'FileName' : filename}
     prompts_candidates = pr_candidates.dict  # dictionary of prompts to fill candidates
 
+    columns, values = ['Filename'], [filename]
     for field in prompts_candidates :  # field must be exactly the name of an attribute
         prompt_template = prompts_candidates[field]
         prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
         chain = call_to_llm.create_chain(llm, prompt)
 
         ## Retrieving and calling the LLM
-        sources = vectorstore_lib.retrieving(retriever_obj, field, retriever_type="vectordb", with_scores=True)
+        sources = vectorstore_lib.retrieving(retriever_obj, field, retriever_type=retriever_type, with_scores=True)
         context = call_to_llm.create_context_from_chunks(sources)
         answer = chain.predict(context=context)
         if verbose:
             print(f"Filling the {field} information... Here are the retrieved chunks with scores: \n\n")
             call_to_llm.print_chunks(sources)
             print(answer, "\n")
+        data[field] = answer
                 
         # todo : fill the candidate table with each attribute (each field)
-        db_cursor.execute(f"""INSERT INTO candidates ({field}) 
-                                  VALUES ('{answer}');""")
+        columns.append(field)
+        values.append(data[field])
+    print(columns)
+    print(filename)
+    columns = ", ".join(columns)
+    values = "'" + "', '".join(values) + "'"
+    db_cursor.execute(f"""INSERT INTO candidates ({columns}) 
+                                  VALUES ({values});""")
     return
 
 def fill_database(cursor, docs, table_prompts, print_time=True, force_refill=False):
@@ -164,6 +173,9 @@ def initialize_database(database, verbose=True):
 
 
 if __name__ == "__main__":
+    docs, nb_files = load_pdf.load_files(data_dir, loader_method='PyMuPDFLoader')
+    print("Files :", [doc.metadata['source'] for doc in docs])
+    print("Done loading files")
     print("Creating/accessing the MySQL database...")
     #username = input("Enter your username : ")
     password = getpass.getpass("Enter your MySQL password: ")
@@ -174,11 +186,14 @@ if __name__ == "__main__":
     )
     cursor = mydb.cursor()
     initialize_database(mydb)
-    filename = "..data/CV_justine_falque.pdf"
-#    prompts_df = load_csv.load_csv(table_prompts_path)
-    docs = load_pdf.load_files(data_dir, persist_directory=persist_directory, loader_method='PyMuPDFLoader')[0]
+    print("Done initializing")
     for doc in docs:
-        add_one_cv(cursor, doc)
+        add_one_cv(cursor, doc, verbose=True)
+        mydb.commit()
+    cursor.execute("SELECT FirstName, FamilyName, PhoneNumber, Email FROM candidates")
+    extract = cursor.fetchall()
+    for entry in extract :
+        print(*entry)
 
     cursor.close()
     mydb.close()

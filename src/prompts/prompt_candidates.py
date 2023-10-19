@@ -23,13 +23,6 @@ Female
 
 Curriculum Vitae : ```{context}```
 """,
-"FileName": """ You will be provided with a Curriculum Vitae delimited by triple backsticks.
-Your task is to find and provide the file name of this Curriculum Vitae.
-Your output should be only the file name of the person, do not make a sentence.
-Do not provide answer out of the Curriculum Vitae. If you did not find it, you should output "Unknown".
-
-Curriculum Vitae : ```{context}```
-""",
 "FirstName": """ You will be provided with a Curriculum Vitae delimited by triple backsticks.
 Your task is to find and provide the first name of the person in this Curriculum Vitae.
 Your output should be only the first name of the person, do not make a sentence.
