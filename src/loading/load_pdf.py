@@ -19,7 +19,8 @@ def load_files(data_dir, persist_directory=None, loader_method='PyMuPDFLoader') 
     if len(vectors) == 0 :  # initial filling of database
         loaders = []
         for f in files :
-            loaders.append(loader_method(data_dir+f))
+            if "pdf" in f:
+                loaders.append(loader_method(data_dir+f))
         for loader in loaders:
             docs.extend(loader.load())   # chaque doc a plusieurs pages, chacune a des metadonnées
             # extend recolle 2 listes en une, donc c'est une liste de toutes les pages

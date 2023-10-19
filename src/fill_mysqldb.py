@@ -48,7 +48,7 @@ def add_one_cv(db_cursor, doc, force_refill=False, save=True, verbose=False):
         filename = doc.metadata['source']
         if verbose:
             print("Filling the database with " + filename + "...\n")
-        db_cursor.execute("SELECT NameFile FROM candidates")
+        db_cursor.execute("SELECT FileName FROM candidates")
         known_files = db_cursor.fetchall()
         if filename in known_files :
             print("CV already parsed.")
@@ -123,8 +123,8 @@ def add_one_cv_candidate(db_cursor, filename, retriever_obj, retriever_type="vec
             print(answer, "\n")
                 
         # todo : fill the candidate table with each attribute (each field)
-        # INSERT INTO customers (customer_name, email, address) VALUES ('John Doe', 'johndoe@example.com', '123 Main St');
-        print("to implement")
+        db_cursor.execute(f"""INSERT INTO candidates ({field}) 
+                                  VALUES ('{answer}');""")
     return
 
 def fill_database(cursor, docs, table_prompts, print_time=True, force_refill=False):
@@ -149,8 +149,8 @@ def initialize_database(database, verbose=True):
         database.commit()
     database.database = db_name
     cursor.execute(sql.create_candidates)
-    cursor.execute(sql.create_languages)
-    cursor.execute(sql.create_speaks)
+    # cursor.execute(sql.create_languages)
+    # cursor.execute(sql.create_speaks)
     if verbose :
         cursor.execute("SHOW TABLES")
         tables = cursor.fetchall()
@@ -174,8 +174,11 @@ if __name__ == "__main__":
     )
     cursor = mydb.cursor()
     initialize_database(mydb)
-    prompts_df = load_csv.load_csv(table_prompts_path)
-    docs = load_pdf.load_files(data_dir, persist_directory=persist_directory, loader_method='PyMuPDFLoader')
+    filename = "..data/CV_justine_falque.pdf"
+#    prompts_df = load_csv.load_csv(table_prompts_path)
+    docs = load_pdf.load_files(data_dir, persist_directory=persist_directory, loader_method='PyMuPDFLoader')[0]
+    for doc in docs:
+        add_one_cv(cursor, doc)
 
     cursor.close()
     mydb.close()
