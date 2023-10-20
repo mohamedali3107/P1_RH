@@ -60,9 +60,9 @@ if len(sys.argv) > 1 and sys.argv[1] == 'clean' :
 
 ## Vectorstore creation
 docs, nb_files = load_pdf.load_files(data_dir, 
-                                                        persist_directory=persist_directory, 
-                                                        loader_method=loader_method
-                                                        )
+                                     check_directory=persist_directory, 
+                                     loader_method=loader_method
+                                     )
 vectordb, list_of_names_as_str = vectorstore_lib.create_vector_db(docs, 
                                                                   data_dir, 
                                                                   splitter, 
