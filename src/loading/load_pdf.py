@@ -26,13 +26,13 @@ def load_files(data_dir, check_directory=None, loader_method='PyMuPDFLoader') :
         for f in files :
             loaders.append(loader_method(data_dir+f))
         for loader in loaders:
-            docs.extend(loader.load())   # chaque doc a plusieurs pages, chacune a des metadonnées
-            # extend recolle 2 listes en une, donc c'est une liste de toutes les pages
-    docs = merge_doubles_in_list_docs(docs) # affectation is not actually necessary
-    assert len(docs) == len(files)  # tout moche
+            docs.extend(loader.load())   # docs = list of all pages as disctinct documents
+    if len(docs) > 0 :
+        docs = merge_doubles_in_list_docs(docs) # affectation is not actually necessary
+        assert len(docs) == len(files)  # tout moche
     return docs, len(files)  # all pages, nb_files
 
-def merge_doubles_in_list_docs(docs) :
+def merge_doubles_in_list_docs(docs):
     if len(docs) > 0 :
         prec = docs[0]
     i = 1
@@ -40,6 +40,7 @@ def merge_doubles_in_list_docs(docs) :
         suiv = docs[i]
         if suiv.metadata['source'] == prec.metadata['source'] :
             prec.page_content += '\n\n' + suiv.page_content
+            print(prec.page_content)
             docs.pop(i)
         else :
             prec = suiv
@@ -47,7 +48,7 @@ def merge_doubles_in_list_docs(docs) :
     return docs
 
 
-def load_files_all_at_once(data_dir, persist_directory) :
+def load_files_all_at_once(data_dir, persist_directory):
     vectors = utils.list_of_files(persist_directory) # to check if empty
     if len(vectors) == 0 :  # initial filling of database
         loader = PyPDFDirectoryLoader(data_dir)
