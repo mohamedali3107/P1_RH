@@ -9,26 +9,13 @@ import mysql.connector
 import fill_mysqldb as fill
 import loading.load_pdf as load_pdf
 import call_llm_on_db
+import get_db_info
 
 import os
 import openai
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv()) # read local .env file
 openai.api_key  = os.environ['OPENAI_API_KEY']
-
-
-# todo : faire autrement !
-all_fields = ["FileName"
-"FirstName",
-"FamilyName",
-"Gender",
-"Email",
-"PhoneNumber",
-"LinkedIn",
-"Webpage",
-"Country",
-"City"
-]
 
 list_of_names = ["Leo SOUQUET", "Justine Falque", "Robert VESOUL", "Aymeric Bernard"]
 
@@ -86,7 +73,8 @@ if __name__ == "__main__":
         print(*entry)
     print('\n')
     query = input("query ? ")
-    res = call_llm_on_db.ask_filtered_query(cursor, query, list_of_names, all_fields, llm='default')
+    all_fields = get_db_info.all_fields(cursor)
+    res = call_llm_on_db.ask_filtered(cursor, query, list_of_names, all_fields, llm='default')
     print(res)
     cursor.close()
     mydb.close()
