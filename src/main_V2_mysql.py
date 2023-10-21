@@ -2,13 +2,13 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter #TokenTextSpl
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
 # my modules 
-import loading.load_pdf as load_pdf
 import loading.utils as utils
 import getpass
 import mysql.connector
 import fill_mysqldb as fill
-import loading.load_pdf as load_pdf
+import loading.load_pdf as load
 import call_llm_on_db
+from CVDataBase import CVDataBase
 
 import os
 import openai
@@ -61,36 +61,63 @@ print_scores = with_scores and (retriever_type=='vectordb')
 llm_name = 'gpt-3.5-turbo'
 llm = ChatOpenAI(model_name=llm_name, temperature=0)
 
-if __name__ == "__main__":
-    docs, nb_files = load_pdf.load_files(data_dir, loader_method='PyMuPDFLoader')
-    print("Files :", [doc.metadata['source'] for doc in docs])
-    print("Done loading files")
-    print("Creating/accessing the MySQL database...")
-    #username = input("Enter your username : ")
-    password = getpass.getpass("Enter your MySQL password: ")
-    mydb = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password=password,
-    )
-    cursor = mydb.cursor()
-    fill.initialize_database(mydb)
-    print("Done initializing")
-    for doc in docs:
-        fill.add_one_cv(cursor, doc, verbose=True)
-        mydb.commit()
-    cursor.execute("SELECT FirstName, FamilyName, PhoneNumber, Email FROM candidates;")
-    extract = cursor.fetchall()
+def test_classes():
+    db = CVDataBase()
+    db.initialize()
+    print(db.list_tables())
+    docs, nb_files = load.load_files(data_dir)
+    doc = docs[0]
+    # One CV
+    db.add_cv(doc)
+    print(db.list_tables())
+    select_cols = ['FirstName', 'FamilyName', 'PhoneNumber', 'Email']
+    extract = db.select(select_cols, db.candidates.name)
     print('\nSome selected columns from the database :\n')
     for entry in extract :
         print(*entry)
     print('\n')
+    # All CVs
+    db.fill_all_cv(docs)
+    extract = db.select(select_cols, db.candidates.name)
+    print('\nSome selected columns from the database :\n')
+    for entry in extract :
+        print(*entry)
+    print('\n')
+    db.cursor.close()
+    db.db.close()
+
+
+if __name__ == "__main__":
+    test_classes()
+    # docs, nb_files = load.load_files(data_dir, loader_method='PyMuPDFLoader')
+    # print("Files :", [doc.metadata['source'] for doc in docs])
+    # print("Done loading files")
+    # print("Creating/accessing the MySQL database...")
+    # #username = input("Enter your username : ")
+    # password = getpass.getpass("Enter your MySQL password: ")
+    # mydb = mysql.connector.connect(
+    #     host="localhost",
+    #     user="root",
+    #     password=password,
+    # )
+    # cursor = mydb.cursor()
+    # fill.initialize_database(mydb)
+    # print("Done initializing")
+    # for doc in docs:
+    #     fill.add_one_cv(cursor, doc, verbose=True)
+    #     mydb.commit()
+    # cursor.execute("SELECT FirstName, FamilyName, PhoneNumber, Email FROM candidates;")
+    # extract = cursor.fetchall()
+    # print('\nSome selected columns from the database :\n')
+    # for entry in extract :
+    #     print(*entry)
+    # print('\n')
     #query = input("query ? ")
     #res = call_llm_on_db.ask_filtered_query(cursor, query, list_of_names, all_fields, llm='default')
     #print(res)
-    cursor.execute("DESC candidates;")
-    cols = cursor.fetchall()
-    for col in cols :
-        print(col[0])
-    cursor.close()
-    mydb.close()
+    # cursor.execute("DESC candidates;")
+    # cols = cursor.fetchall()
+    # for col in cols :
+    #    print(col[0])
+    # cursor.close()
+    # mydb.close()
