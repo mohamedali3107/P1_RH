@@ -51,7 +51,6 @@ def add_one_cv(db_cursor, doc, force_refill=False, save=True, verbose=False):
         db_cursor.execute("SELECT FileName FROM candidates")
         known_files = db_cursor.fetchall()
         known_files = [file[0] for file in known_files]
-        print("known :", known_files)
         if filename in known_files :
             print("CV already parsed.")
             return
@@ -107,11 +106,11 @@ def add_one_cv_language(db_cursor, retriever_obj, retriever_type="vectordb", for
 
 def add_one_cv_candidate(db_cursor, filename, retriever_obj, retriever_type="vectordb", force_refill=False, save=True, verbose=False):
     data = {'FileName' : filename}
-    prompts_candidates = pr_candidates.dict  # dictionary of prompts to fill candidates
+    prompts_candidates = pr_candidates.dict_candidates  # dictionary of prompts to fill candidates
 
     columns, values = ['Filename'], [filename]
     for field in prompts_candidates :  # field must be exactly the name of an attribute
-        prompt_template = prompts_candidates[field]
+        prompt_template = prompts_candidates[field]['prompt']
         prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
         chain = call_to_llm.create_chain(llm, prompt)
 

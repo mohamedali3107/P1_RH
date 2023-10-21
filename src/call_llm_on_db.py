@@ -8,19 +8,7 @@ from langchain.chat_models import ChatOpenAI
 import prompts.prompt_extract_names as prompt_extract_names
 import prompts.prompt_format_name as prompt_format_name
 import prompts.prompt_single_cv as prompt_single_cv
-
-# todo : faire autrement !
-all_fields = ["FileName"
-"FirstName",
-"FamilyName",
-"Gender",
-"Email",
-"PhoneNumber",
-"LinkedIn",
-"Webpage",
-"Country",
-"City"
-]
+import get_db_info
 
 
 def create_chain(llm, prompt) :  # le retrieving sera fait manuellement pour le 'context' du prompt
@@ -54,24 +42,24 @@ def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', ll
         print('Type of tranversal question not supported yet')
         return ''
 
-def ask_question(dict_db, csv_file, all_loaded, question, chain='default', llm='default') :
+def ask_question(cursordb, csv_file, all_loaded, question, chain='default', llm='default') :
     '''Assumes all CVs to study have been loaded (ideally does not assume all fields and loads missing, todo)'''
-    list_of_fields = load_from_csv.list_of_fields_csv(csv_file)
+    list_of_fields = get_db_info.list_of_fields(cursordb)
     try :
         mode = treat_query.detect_query_mode(question, llm=llm)
     except Exception as err :
         print(*err.args)
         mode = 'unknown'
     if mode == 'transverse' :
-        return ask_question_multi(dict_db, question, list_of_fields, chain=chain, llm=llm)
+        return ask_question_multi(cursordb, question, list_of_fields, chain=chain, llm=llm)
     elif mode == 'single' :
         # todo : exceptions
         list_of_names = list(all_loaded.values())
-        return filtered_query.ask_filtered_query(dict_db, question, list_of_names, list_of_fields, llm=llm)
+        return ask_filtered(cursordb, question, list_of_names, list_of_fields, llm=llm)
     else :
         return('Mode transverse/single unclear')
 
-def ask_filtered_query(cursordb, question, list_of_names, all_fields, llm='default') :
+def ask_filtered(cursordb, question, list_of_names, all_fields, llm='default') :
     if llm == 'default' :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
     # identify filter
@@ -88,17 +76,7 @@ def ask_filtered_query(cursordb, question, list_of_names, all_fields, llm='defau
         first, fam = name.split(" ")
         query = f"""SELECT {field} FROM candidates WHERE FirstName = '{first}' AND FamilyName = '{fam}';"""
         cursordb.execute(query)
-        ans = cursordb.fetchall()[0][0]
-        data.append(ans)
+        entry = cursordb.fetchall()[0][0]
+        data.append(entry)
     chain = LLMChain(llm=llm, prompt=prompt_single_cv.prompt_from_field)
     return chain.predict(topic=fields, data=data, question=question)  # lists as inputs
-    
-def test_question_dico() :
-    csv_file = load_from_csv.load_csv("data_template_concise_no_double.csv")
-    dict_db = {}
-    loaded = {}
-    load_from_csv.load_full_csv_to_dict(csv_file, dict_db, loaded)
-    print(list(loaded.values()))
-    question = input("query ? ")
-    res = ask_question(dict_db, csv_file, loaded, question, chain='default', llm='default')
-    print(res)

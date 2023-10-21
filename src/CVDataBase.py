@@ -2,7 +2,7 @@ import time
 import getpass
 import mysql.connector
 import sql_queries as sql
-import Candidates
+from Candidates import Candidates
 import subprocess
 import vectorstore_lib
 import loading.load_pdf as load
@@ -46,7 +46,7 @@ class CVDataBase():
             self.execute("CREATE DATABASE " + self.name)
             self.db.commit()
         self.db.database = self.name
-        self.candidates = Candidates()  # table creation
+        self.candidates = Candidates(self)  # table creation
         # cursor.execute(sql.create_languages)
         # cursor.execute(sql.create_speaks)
         if verbose:
@@ -60,6 +60,7 @@ class CVDataBase():
                     print("   ", col)
 
     def all_fields(self):
+        # todo : implement
         fields = []
         for table in self.tables:
             fields.extend(["table.attributs"])
@@ -69,16 +70,18 @@ class CVDataBase():
         for doc in docs:
             try:
                 self.add_cv(doc, force_refill=force_refill, verbose=verbose)
-            except:
-                print("Error filling the database for " + doc)
+            except Exception as e:
+                print("Error filling the database for " + doc.metadata['source'])
+                print(e)
         if verbose:
             print("Time to fill the database with new CVs : {:.2f}s".format(time.time()-t0))
 
-    def add_cv(self, doc, verbose=True):
+    def add_cv(self, doc, force_refill=False, verbose=True):
+        # todo : handle force_refill
         filename = doc.metadata['source']
         if verbose:
             print("\nFilling the database with " + filename +" ...\n")
-        known_files = self.select(self.candidates.primary_key, self.candidates.name)
+        known_files = self.select(columns=self.candidates.primary_key, table=self.candidates.name)
         known_files = [file[0] for file in known_files]
         if filename in known_files:
             print("CV already parsed.")

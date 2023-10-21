@@ -79,14 +79,18 @@ if __name__ == "__main__":
     for doc in docs:
         fill.add_one_cv(cursor, doc, verbose=True)
         mydb.commit()
-    cursor.execute("SELECT FirstName, FamilyName, PhoneNumber, Email FROM candidates")
+    cursor.execute("SELECT FirstName, FamilyName, PhoneNumber, Email FROM candidates;")
     extract = cursor.fetchall()
     print('\nSome selected columns from the database :\n')
     for entry in extract :
         print(*entry)
     print('\n')
-    query = input("query ? ")
-    res = call_llm_on_db.ask_filtered_query(cursor, query, list_of_names, all_fields, llm='default')
-    print(res)
+    #query = input("query ? ")
+    #res = call_llm_on_db.ask_filtered_query(cursor, query, list_of_names, all_fields, llm='default')
+    #print(res)
+    cursor.execute("DESC candidates;")
+    cols = cursor.fetchall()
+    for col in cols :
+        print(col[0])
     cursor.close()
     mydb.close()

@@ -1,3 +1,7 @@
+import prompts.prompt_candidates as pr_candidates
+
+dict_candidates = pr_candidates.dict_candidates
+
 
 create_candidates = """
 CREATE TABLE IF NOT EXISTS candidates (

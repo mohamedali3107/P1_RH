@@ -1,4 +1,7 @@
-import DBTable
+from DBTable import DBTable
+
+# todo : implement
+# Will not work in current state
 
 class CVUnit():
 

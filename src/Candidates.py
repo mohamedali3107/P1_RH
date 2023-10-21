@@ -1,5 +1,5 @@
-import CVUnit
-import DBTable
+from CVUnit import CVUnit
+from DBTable import DBTable
 from sql_queries import create_candidates
 from prompts import prompt_candidates as pr_candidates
 import treat_chunks

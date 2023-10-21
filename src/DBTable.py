@@ -2,7 +2,7 @@
 class DBTable():
 
     def __init__(self, database, sql_query: str, is_entity: bool):
-        self.name = sql_query.split(" ")[2]
+        self.name = sql_query.split(" ")[5]  # follows 'create table if not exist'
         self.database = database
         self.is_entity = is_entity
         database.execute(sql_query)
@@ -21,5 +21,6 @@ class DBTable():
         values = "'" + "', '".join(values) + "'"
         self.database.execute(f"""INSERT INTO candidates ({columns}) 
                                     VALUES ({values});""")
+        self.database.db.commit()
         
     # todo : fill, update, interrogate
