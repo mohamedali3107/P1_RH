@@ -80,3 +80,7 @@ def identify_name(name_approx, list_names, llm='default', verbose=True) :
         if verbose :
             print("Identified candidate :", name)
         return name
+    
+def target_name(query, list_names, llm='default', verbose=True):
+    name_approx = extract_name(query, llm='default', verbose=False)
+    return identify_name(name_approx, list_names, llm='default', verbose=True)

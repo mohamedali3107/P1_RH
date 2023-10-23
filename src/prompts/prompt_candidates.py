@@ -104,7 +104,7 @@ family_name = "FamilyName"
 dict_candidates = {
         #"FileName": {'prompt': None, 'type': 'varchar(50) primary key'},
         "Gender": {'prompt': prompt_gender, 'type': sql_gender},
-        first_name: {'prompt': prompt_first, 'type': sql_family},
+        first_name: {'prompt': prompt_first, 'type': sql_first},
         family_name: {'prompt': prompt_family, 'type': sql_family},
         "Email": {'prompt': prompt_email, 'type': sql_email},
         "PhoneNumber": {'prompt': prompt_phone, 'type': sql_phone},

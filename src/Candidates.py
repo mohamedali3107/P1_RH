@@ -13,10 +13,23 @@ class Candidates() :
     def __init__(self, database):
         self.dict = pr_candidates.dict_candidates  # could/should be a class attribute (or just a global)
         self.database = database
-        self.candidate_names = []
         self.primary_key = pr_candidates.primary_key  # 'FileName'
         self.table = DBTable(database, sql_query=pr_candidates.sql_query, is_entity=True)
         self.name = self.table.name  # 'candidates'
+        self.files_names = {}
+
+    def filenames(self):
+        return list(self.files_names.keys())
+    
+    def candidates_names(self):
+        return list(self.files_names.values())
+    
+    def related_file(self, name):
+        for filename in self.files_names:
+            if self.files_names[filename] == name:
+                return filename
+        # todo : exception
+        return "unknown"
 
     def fill(self, filename, retriever_obj, retriever_type="vectordb", llm='default', verbose=True):
         if llm == 'default':
@@ -37,16 +50,17 @@ class Candidates() :
                 treat_chunks.print_chunks(sources)
                 print(answer, "\n")
             if field == pr_candidates.first_name :
+                print("first name : ", answer)
                 name = [answer] + name
             if field == pr_candidates.family_name :
+                print("family name : ", answer)
                 name = name + [answer]
 
             columns.append(field)
             values.append(answer)
         name = " ".join(name)
         print("NAME : ", name)
-        if name not in self.candidate_names :
-            self.candidate_names.append(name)
+        self.files_names[filename] = name
         self.table.insert(columns, values)
 
     def attributes(self):

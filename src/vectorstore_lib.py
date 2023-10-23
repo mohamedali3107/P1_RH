@@ -20,8 +20,8 @@ def create_vectordb_single(doc, splitter='default', embedding='default', persist
     ## Default parameters
     if splitter == 'default':
         splitter = RecursiveCharacterTextSplitter(
-            chunk_size=200,
-            chunk_overlap=40, 
+            chunk_size=600,
+            chunk_overlap=100, 
             separators=["\n\n", "\n", " ", ""]
         )
     if embedding == 'default':
