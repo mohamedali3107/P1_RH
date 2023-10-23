@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS speaks (
     NameLanguage varchar(30),
     Candidate varchar(50),
     FOREIGN KEY (NameLanguage) REFERENCES languages (NameLanguage),
-    FOREIGN KEY (Candidate) REFERENCES candidates (FileName)
+    FOREIGN KEY (Candidate) REFERENCES candidates (FileName),
+    LanguageLevel varchar(30)
 );
 """

@@ -41,7 +41,7 @@ splitter = RecursiveCharacterTextSplitter(
 embedding = OpenAIEmbeddings()
 llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
 
-def add_one_cv(db_cursor, doc, force_refill=False, save=True, verbose=False):
+def add_one_cv(db_cursor, doc, force_refill=False, save=True, verbose=False, print_chunks=False):
     # todo : if already loaded and not force_refill, print and return accordingly
     if False :
         return
@@ -53,8 +53,6 @@ def add_one_cv(db_cursor, doc, force_refill=False, save=True, verbose=False):
         known_files = db_cursor.fetchall()
         known_files = [file[0] for file in known_files]
         print("These files are known:", known_files)
-        print("Filename:", filename)
-        print("Number of char:", len(filename))
         if filename in known_files :
             print("CV already parsed.")
             return
@@ -68,10 +66,10 @@ def add_one_cv(db_cursor, doc, force_refill=False, save=True, verbose=False):
         )
         retriever_obj = vectordb
         # todo : call to auxiliary functions
-        add_one_cv_candidate(db_cursor, filename, retriever_obj, retriever_type="vectordb", force_refill=force_refill, save=True, verbose=verbose)
-        add_one_cv_language(db_cursor, filename, retriever_obj, retriever_type="vectordb", force_refill=force_refill, save=True, verbose=verbose)
+        add_one_cv_candidate(db_cursor, filename, retriever_obj, retriever_type="vectordb", force_refill=force_refill, save=True, verbose=verbose, print_chunks=print_chunks)
+        add_one_cv_language(db_cursor, filename, retriever_obj, retriever_type="vectordb", force_refill=force_refill, save=True, verbose=verbose, print_chunks=print_chunks)
 
-def get_table_entry(retriever_obj, prompt, question, verbose=False, retriever_type="vectordb", llm='default'): 
+def get_table_entry(retriever_obj, prompt, question, verbose=False, print_chunks=False, retriever_type="vectordb", llm='default'): 
     if llm == 'default' :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
     
@@ -82,33 +80,33 @@ def get_table_entry(retriever_obj, prompt, question, verbose=False, retriever_ty
     context = treat_chunks.create_context_from_chunks(sources)
     answer = chain.predict(context=context)
     if verbose:
-        print(f"Filling the languages information... Here are the retrieved chunks with scores: \n\n")
-        treat_chunks.print_chunks(sources)
-        print(answer, "\n")
+        print(f"Filling the {question} information... \n\n")
+        print("Output of the LLM:", answer, "\n")
+        if print_chunks:
+            print("Here are the retrieved chunks with scores:")
+            treat_chunks.print_chunks(sources)
     return answer
 
-def add_one_cv_language(db_cursor, filename, retriever_obj, retriever_type="vectordb", force_refill=False, save=True, verbose=False):
+def add_one_cv_language(db_cursor, filename, retriever_obj, retriever_type="vectordb", force_refill=False, save=True, verbose=False, print_chunks=False):
     ## Prepare chain with prompt template
     prompt_template = pr_languages.template
     prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
-    llm_output = get_table_entry(retriever_obj, prompt, "languages", verbose=verbose, retriever_type="vectordb", llm='default')
+    llm_output = get_table_entry(retriever_obj, prompt, "languages", verbose=verbose, print_chunks=print_chunks, retriever_type="vectordb", llm='default')
     languages_with_level = eval(llm_output)
-    print("Sortie du LLM \n\n", languages_with_level)
-    print("Type", type(languages_with_level))
     if save:
         db_cursor.execute("SELECT NameLanguage FROM languages")
         known_languages = [lang for sublist in db_cursor.fetchall() for lang in sublist]    # fetchall() returns a list of tuples (Language,)-like
         print("Known languages:", known_languages)
         for lang in languages_with_level:
-            print(lang[0])
-            if lang[0] not in known_languages:
+            language, language_level = lang
+            if language not in known_languages:
                 db_cursor.execute(f"""INSERT INTO languages (NameLanguage) 
-                                  VALUES ('{lang[0]}');""")
-                known_languages.append(lang[0])
-            db_cursor.execute(f"""INSERT INTO speaks (NameLanguage, Candidate) VALUES ('{lang[0]}', '{filename}');""")
+                                  VALUES ('{language}');""")
+                known_languages.append(language)
+            db_cursor.execute(f"""INSERT INTO speaks (NameLanguage, Candidate, LanguageLevel) VALUES ('{language}', '{filename}', '{language_level}');""")
     return
 
-def add_one_cv_candidate(db_cursor, filename, retriever_obj, retriever_type="vectordb", force_refill=False, save=True, verbose=False):
+def add_one_cv_candidate(db_cursor, filename, retriever_obj, retriever_type="vectordb", force_refill=False, save=True, verbose=False, print_chunks=False):
     data = {'FileName' : filename}
     prompts_candidates = pr_candidates.dict  # dictionary of prompts to fill candidates
 
@@ -116,7 +114,7 @@ def add_one_cv_candidate(db_cursor, filename, retriever_obj, retriever_type="vec
     for field in prompts_candidates :  # field must be exactly the name of an attribute
         prompt_template = prompts_candidates[field]
         prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
-        answer = get_table_entry(retriever_obj, prompt, field, verbose=True, retriever_type="vectordb", llm='default')
+        answer = get_table_entry(retriever_obj, prompt, field, verbose=verbose, print_chunks=print_chunks, retriever_type="vectordb", llm='default')
         data[field] = answer
                 
         # todo : fill the candidate table with each attribute (each field)
@@ -179,12 +177,28 @@ def test_filling(cursor):
     for entry in extract :
         print(*entry)
 
+def test_prompt(doc, prompt, question):
+    subprocess.run('rm -rf ' + persist_directory, shell=True)
+    chunks = vectorstore_lib.splitting_of_docs([doc], splitter)
+    vectordb = vectorstore_lib.new_vectordb(chunks, 
+                                embedding,
+                                persist_directory
+        )
+    retriever_obj = vectordb
+    return get_table_entry(retriever_obj, prompt, question)
+
 if __name__ == "__main__":
+    ## Loading files
     docs, nb_files = load_pdf.load_files(data_dir, loader_method='PyMuPDFLoader')
     print("Files :", [doc.metadata['source'] for doc in docs])
     print("Done loading files")
+
+    ## Testing the language prompt
+    # prompt_template = pr_languages.template
+    # prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
+    # print(test_prompt(docs[0], prompt, "languages"))
+
     print("Creating/accessing the MySQL database...")
-    #username = input("Enter your username : ")
     password = getpass.getpass("Enter your MySQL password: ")
     mydb = mysql.connector.connect(
         host="localhost",
