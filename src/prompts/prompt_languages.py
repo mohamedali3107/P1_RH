@@ -1,6 +1,7 @@
 template = """You will be provided with a Curriculum Vitae delimited by triple backsticks.
-Your task is to find the languages spoken with the corresponding proficiency level by the person in this Curriculum Vitae and provide the comprehensive list of these. Once you obtained such a list, translate that list into English to give your final output. If you do not find the proficiency level, you should output 'Unkown' instead.
-Your final output should be a list of tuples of strings, each string in English language and in title case, in the following format:
+Your task is to find the languages spoken with the corresponding proficiency level by the person in this Curriculum Vitae and provide the comprehensive list of these. If a language name is not given in English, translate it to English. If you find, in this Curriculum Vitae, a language name without a specified proficiency level, you should output 'Unknown' instead of the proficiency level.
+Do not provide answer out of the Curriculum Vitae.
+Your final output should be a list of tuples of strings given in title case and in English, in the following format:
 
 [(Language 1, Proficiency level 1), (Language 2, Proficiency level 2), (Language 3, Proficiency level 3)]
 

@@ -177,7 +177,7 @@ def test_filling(cursor):
     for entry in extract :
         print(*entry)
 
-def test_prompt(doc, prompt, question):
+def test_prompt(doc, prompt, question, verbose=True, print_chunks=True):
     subprocess.run('rm -rf ' + persist_directory, shell=True)
     chunks = vectorstore_lib.splitting_of_docs([doc], splitter)
     vectordb = vectorstore_lib.new_vectordb(chunks, 
@@ -185,7 +185,7 @@ def test_prompt(doc, prompt, question):
                                 persist_directory
         )
     retriever_obj = vectordb
-    return get_table_entry(retriever_obj, prompt, question)
+    return get_table_entry(retriever_obj, prompt, question, verbose=verbose, print_chunks=print_chunks)
 
 if __name__ == "__main__":
     ## Loading files
@@ -194,9 +194,11 @@ if __name__ == "__main__":
     print("Done loading files")
 
     ## Testing the language prompt
-    # prompt_template = pr_languages.template
-    # prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
-    # print(test_prompt(docs[0], prompt, "languages"))
+#     prompt_template = pr_languages.template
+#     prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
+# #    test_prompt(docs[0], prompt, "languages")
+#     for doc in docs:
+#         test_prompt(doc, prompt, "languages", print_chunks=False)
 
     print("Creating/accessing the MySQL database...")
     password = getpass.getpass("Enter your MySQL password: ")
