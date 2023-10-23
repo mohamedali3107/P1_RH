@@ -98,11 +98,14 @@ Do not provide answer out of the Curriculum Vitae. If you did not find it, you s
 Curriculum Vitae : ```{context}```
 """
 
+primary_key = "FileName"
+first_name = "FirstName"
+family_name = "FamilyName"
 dict_candidates = {
         #"FileName": {'prompt': None, 'type': 'varchar(50) primary key'},
         "Gender": {'prompt': prompt_gender, 'type': sql_gender},
-        "FirstName": {'prompt': prompt_first, 'type': sql_family},
-        "FamilyName": {'prompt': prompt_family, 'type': sql_family},
+        first_name: {'prompt': prompt_first, 'type': sql_family},
+        family_name: {'prompt': prompt_family, 'type': sql_family},
         "Email": {'prompt': prompt_email, 'type': sql_email},
         "PhoneNumber": {'prompt': prompt_phone, 'type': sql_phone},
         "LinkedIn": {'prompt': prompt_linkedin, 'type': sql_linkedin},
@@ -110,7 +113,6 @@ dict_candidates = {
         "Country": {'prompt': prompt_country, 'type': sql_country},
         "City": {'prompt': prompt_city, 'type': sql_city}
         }
-primary_key = "FileName"
 
 table_name = "candidates"
 sql_query = "CREATE TABLE IF NOT EXISTS " + table_name + " ( "

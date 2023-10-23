@@ -8,6 +8,7 @@ class DBTable():
         database.execute(sql_query)
         self.database.execute("DESC " + self.name)
         self.columns = self.database.cursor.fetchall()
+        print("fetchall columns : ", self.columns)
 
     def columns(self, full_desc: bool = False):
         cols = self.columns
