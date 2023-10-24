@@ -1,5 +1,6 @@
 .env
 test.py
+*.DS_Store
 data/*
 *.pdf
 *.zip

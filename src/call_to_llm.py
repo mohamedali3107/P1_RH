@@ -6,6 +6,11 @@ import filtered_query
 import loading.load_from_csv as load_from_csv
 import treat_chunks
 
+# for get_table_entry
+import vectorstore_lib
+from langchain.chat_models import ChatOpenAI
+
+
 def create_chain(llm, prompt) :  # le retrieving sera fait manuellement pour le 'context' du prompt
     return LLMChain(llm=llm, prompt=prompt)
 
@@ -25,6 +30,22 @@ def get_result(chain, chunks, question, print_source_docs=True, print_scores=Tru
     else :
         inputs = [{"context" : context, "question" : question}]
         return chain.apply(inputs)  # list of results [{'text': '...'},...]
+    
+def get_table_entry(retriever_obj, prompt, question, verbose=False, print_chunks=False, retriever_type="vectordb", llm='default'): 
+    if llm == 'default' :
+        llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
+    chain = create_chain(llm, prompt)
+    ## Retrieving and calling the LLM
+    sources = vectorstore_lib.retrieving(retriever_obj, question, retriever_type="vectordb", with_scores=True)
+    context = treat_chunks.create_context_from_chunks(sources)
+    answer = chain.predict(context=context)
+    if verbose:
+        print(f"Asking the LLM about {question}... \n\n")
+        print("Output of the LLM:", answer, "\n")
+        if print_chunks:
+            print("Here are the retrieved chunks with scores:")
+            treat_chunks.print_chunks(sources)
+    return answer
 
 def print_multi_result(inputs, results, print_context : bool =False) :
     '''Input : 

@@ -22,3 +22,6 @@ Here are some examples of final outputs:
 Curriculum Vitae : ```{context}```
 """
 
+dict_languages = {
+    'languages': {'prompt': template, 'type': ''}
+    }
