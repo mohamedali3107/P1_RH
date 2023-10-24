@@ -28,8 +28,9 @@ create_speaks = """
 CREATE TABLE IF NOT EXISTS speaks (
     id INT AUTO_INCREMENT PRIMARY KEY,
     NameLanguage varchar(30),
-    Candidate varchar(30),
-    FOREIGN KEY (NameLanguage) REFERENCES languages (Name),
-    FOREIGN KEY (Candidate) REFERENCES candidates (FileName)
+    Candidate varchar(50),
+    FOREIGN KEY (NameLanguage) REFERENCES languages (NameLanguage),
+    FOREIGN KEY (Candidate) REFERENCES candidates (FileName),
+    LanguageLevel varchar(30)
 );
 """

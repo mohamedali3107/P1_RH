@@ -99,6 +99,7 @@ Curriculum Vitae : ```{context}```
 """
 
 primary_key = "FileName"
+primary_type = "varchar(50)"
 first_name = "FirstName"
 family_name = "FamilyName"
 dict_candidates = {
@@ -116,7 +117,7 @@ dict_candidates = {
 
 table_name = "candidates"
 sql_query = "CREATE TABLE IF NOT EXISTS " + table_name + " ( "
-sql_query += primary_key + " varchar(50) primary key, "
+sql_query += primary_key + f" {primary_type} primary key, "
 sql_query += ', '.join([field+dict_candidates[field]['type'] for field in dict_candidates])
 sql_query += ');'
 

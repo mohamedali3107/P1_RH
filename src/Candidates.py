@@ -1,6 +1,4 @@
-from CVUnit import CVUnit
 from DBTable import DBTable
-from sql_queries import create_candidates
 from prompts import prompt_candidates as pr_candidates
 import treat_chunks
 import vectorstore_lib
@@ -40,7 +38,6 @@ class Candidates() :
             prompt_template = self.dict[field]['prompt']
             prompt = PromptTemplate(template=prompt_template, input_variables=['context'])
             chain = call_to_llm.create_chain(llm, prompt)   # call_to_llm un peu useless
-
             ## Retrieving and calling the LLM
             sources = vectorstore_lib.retrieving(retriever_obj, field, retriever_type=retriever_type, with_scores=True)
             context = treat_chunks.create_context_from_chunks(sources)
@@ -50,16 +47,12 @@ class Candidates() :
                 treat_chunks.print_chunks(sources)
                 print(answer, "\n")
             if field == pr_candidates.first_name :
-                print("first name : ", answer)
                 name = [answer] + name
             if field == pr_candidates.family_name :
-                print("family name : ", answer)
                 name = name + [answer]
-
             columns.append(field)
             values.append(answer)
         name = " ".join(name)
-        print("NAME : ", name)
         self.files_names[filename] = name
         self.table.insert(columns, values)
 

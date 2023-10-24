@@ -6,6 +6,8 @@ from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 import sql_queries as sql
 from Candidates import Candidates
+from CVUnit import CVUnit
+from Languages import Languages
 from prompts.prompt_extract_names import prompt_name_in_query
 from prompts.prompt_format_name import prompt_identify_name
 import prompts.prompt_single_cv as pr_single
@@ -40,7 +42,8 @@ class CVDataBase():
             self.db.commit()
         self.db.database = self.name
         self.candidates = Candidates(self)  # table creation
-        # todo : other calls to other constructors
+        self.entities['languages'] = Languages(self)
+        # todo : other calls to other constructors 
         if verbose:
             tables = self.list_tables()
             print("Database tables :")
@@ -126,6 +129,7 @@ class CVDataBase():
             vectordb = vectorstore_lib.create_vectordb_single(doc)
             self.candidates.fill(filename, vectordb, retriever_type='vectordb',
                                  llm='default', verbose=True)
+            self.entities['languages'].fill(filename, vectordb, retriever_type="vectordb", llm='default', verbose=True)
 
     def outputs_for_each_cv(self, question: str, fields_dict: dict, 
                                         chain='default', llm='default', verbose=False):

@@ -10,12 +10,14 @@ class DBTable():
         self.database.execute("DESC " + self.name)
         self.cols = self.database.cursor.fetchall()
 
-    def columns(self, full_desc: bool = False):
+    def columns(self, full_desc: bool = False, include_primary: bool =True):
         cols = self.cols
         if full_desc:
             return deepcopy(cols)
         else:
-            return [col[0] for col in cols]
+            if include_primary:
+                return [col[0] for col in cols]
+            return [col[0] for col in cols if col[3] != 'PRI']
         
     def insert(self, columns, values):
         columns = ", ".join(columns)
