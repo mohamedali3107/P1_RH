@@ -109,7 +109,7 @@ class CVDataBase():
         filename = doc.metadata['source']
         if verbose:
             print("\nFilling the database with " + filename +" ...\n")
-        ## names of files already in the database (but not yet recorded in the CVDataBase object) :
+        ## names of files already in the database (but not yet recorded in the CVDataBase object):
         known_files = self.select(columns=self.candidates.primary_key, table=self.candidates.name)
         known_files = [file[0] for file in known_files]
         if filename in known_files:
@@ -130,7 +130,8 @@ class CVDataBase():
     def outputs_for_each_cv(self, question: str, fields_dict: dict, 
                                         chain='default', llm='default', verbose=False):
         '''Ask a question separately on each CV and return dictionary of outputs
-        Input attribute_fields specifies if fields are all part of the candidates's attributes
+        Input fields_dict specifies wether the fields are part of the candidates's attributes
+        (value = True) or involve other tables (False) (None if unknown)
         '''
         outputs = {}
         for name in self.candidates.candidates_names():
