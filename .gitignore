@@ -1,6 +1,6 @@
 .env
 test.py
-*.txt
+data/*
 *.pdf
 *.zip
 __pycache__/*

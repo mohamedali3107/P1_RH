@@ -1,0 +1,10 @@
+langchain
+python-dotenv
+openai
+chardet
+cchardet
+chromadb
+tiktoken
+pymupdf
+gradio
+mysql-connector-python
