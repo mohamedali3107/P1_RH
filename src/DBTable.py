@@ -1,3 +1,4 @@
+from copy import deepcopy
 
 class DBTable():
 
@@ -7,12 +8,12 @@ class DBTable():
         self.is_entity = is_entity
         database.execute(sql_query)
         self.database.execute("DESC " + self.name)
-        self.columns = self.database.cursor.fetchall()
+        self.cols = self.database.cursor.fetchall()
 
     def columns(self, full_desc: bool = False):
-        cols = self.columns
+        cols = self.cols
         if full_desc:
-            return cols
+            return deepcopy(cols)
         else:
             return [col[0] for col in cols]
         

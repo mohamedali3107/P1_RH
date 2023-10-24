@@ -102,7 +102,7 @@ class CVDataBase():
                 print(e)
         if verbose:
             print("Time to fill the database with new CVs : {:.2f}s".format(time.time()-t0))
-            print("Names : ", self.candidates.candidate_names)
+            print("Names : ", self.candidates.candidates_names)
 
     def add_cv(self, doc, force_refill=False, verbose=True):
         # todo : handle force_refill
@@ -134,12 +134,12 @@ class CVDataBase():
         '''
         outputs = {}
         for name in self.candidates.candidates_names():
-            output = self.ask_targeted(question, fields=fields_dict, name=name,
+            output = self.ask_targeted(question, fields_dict=fields_dict, name=name,
                                        llm=llm, chain=chain, verbose=verbose)
             outputs[name] = output
         return outputs
 
-    def ask_targeted(self, question: str, fields_dict: dict, name: str = '',
+    def ask_targeted(self, question: str, fields_dict: dict = {}, name: str = '',
                                     llm='default', chain='default', verbose=True):
         '''Return LLM's answer to a question on a targeted CV as a string
         Targeted candidate/CV should appear either in question or as filename optional argument.
@@ -153,6 +153,8 @@ class CVDataBase():
             name = treat_query.target_name(question, self.candidates.candidates_names(), 
                                            llm=llm, verbose=verbose)
         filename = self.candidates.related_file(name)  # todo: case of homonym candidates
+        if fields_dict == {}:
+            fields_dict = self.target_fields_as_dict(question, verbose=False)
         # retrieve data
         data = []
         for field in fields_dict:
@@ -167,8 +169,7 @@ class CVDataBase():
     
     def ask_transverse(self, query_multi: str, fields_dict: dict, chain='default',
                                     llm='default', verbose=True):
-        operation = treat_query.detect_operation_from_query(query_multi, llm=llm)
-        if verbose: print("Identified operation :", operation)
+        operation = treat_query.detect_operation_from_query(query_multi, llm=llm, verbose=verbose)
         if operation == 'Condition' or operation == 'Comparison':  # Comparison is actually useless
             mono_query = treat_query.multi_to_mono(query_multi)
             outputs = self.outputs_for_each_cv(mono_query, fields_dict, chain=chain,
@@ -196,11 +197,10 @@ class CVDataBase():
         try:
             fields = treat_query.extract_target_fields(query, 
                                                        candidate_attributes+other_fields,
-                                                       llm=llm)
+                                                       llm=llm, verbose=verbose)
         except Exception as err :
             print(*err.args)
             fields = ['unknown']  # todo : plutôt [] mais à gérer dans fonctions appelées
-        if verbose: print("Involved fields :", fields)
         fields_involved = {}
         for field in fields:
             if field in candidate_attributes:
@@ -216,16 +216,15 @@ class CVDataBase():
         '''Identify type of query, then call auxiliary depending on type'''
         fields_dict = self.target_fields_as_dict(query, llm=llm, verbose=verbose)
         try:
-            mode = treat_query.detect_query_mode(query, llm=llm)
+            mode = treat_query.detect_query_mode(query, llm=llm, verbose=verbose)
         except Exception as err:
             print(*err.args)
             mode = 'unknown'
-        if verbose: print("Identified mode :", mode)
         if mode == 'transverse':
-            return self.ask_transverse(self, query, fields_dict, chain=chain,
+            return self.ask_transverse(query, fields_dict, chain=chain,
                                        llm=llm, verbose=verbose)
         elif mode == 'single':
             # todo : exceptions
-            return self.ask_targeted(self, query, fields_dict, llm=llm, verbose=verbose)
+            return self.ask_targeted(query, fields_dict, llm=llm, verbose=verbose)
         else:
             return('Mode transverse/single unclear')
