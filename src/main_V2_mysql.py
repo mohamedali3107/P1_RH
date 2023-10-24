@@ -83,6 +83,11 @@ def test_classes():
     for entry in extract :
         print(*entry)
     print('\n')
+    while True:
+        query = input('\nquery (or quit) :  ')
+        if query == 'quit':
+            break
+        print(db.ask_question(query))
     db.cursor.close()
     db.db.close()
 
