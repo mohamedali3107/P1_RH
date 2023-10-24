@@ -64,8 +64,7 @@ def extract_name(query, llm='default', verbose=False) :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
     llm_chain = LLMChain(prompt=prompt_extract_names.prompt_name_in_query, llm=llm)
     name = llm_chain.predict(context=query)
-    if verbose :
-        print("Name as extracted :", name)
+    if verbose : print("Name as extracted :", name)
     return name
     
 def identify_name(name_approx, list_names, llm='default', verbose=True) :
@@ -77,8 +76,7 @@ def identify_name(name_approx, list_names, llm='default', verbose=True) :
         raise Exception('identify_name output is none of expected', list_names, 
                         '\ninput = "' + name_approx + '"', '\noutput = "' + name + '"')
     else:
-        if verbose :
-            print("Identified candidate :", name)
+        if verbose : print("Candidate :", name)
         return name
     
 def target_name(query, list_names, llm='default', verbose=True):

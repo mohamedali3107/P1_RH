@@ -69,6 +69,20 @@ class CVDataBase():
             return candidates_attributes + other_fields
         else:
             return candidates_attributes, other_fields
+        
+    def is_candidate_attribute(self, fields, as_dict=False):
+        '''Return True if all in fields are candidates attributes
+        Return False if all in fields are other fields (other tables' names)
+        Return None if none of the above
+        Input fields: list or tuple of fields (str) or a single field'''
+        if not isinstance(fields, list):
+            fields = list(fields)
+        attributes, other_fields = self.all_fields(fusion=False)
+        if all([field in attributes for field in fields]):
+            return True
+        elif all([field in other_fields for field in fields]):
+            return False
+        else: return None
 
     def select(self, columns: list, table: str, condition: str = '') :
         '''Input condition: str that specifies optional ending to the select query (ex: "where...")
@@ -110,68 +124,108 @@ class CVDataBase():
                 self.candidates.files_names[filename] = name
         else:
             vectordb = vectorstore_lib.create_vectordb_single(doc)
-            self.candidates.fill(filename, vectordb, retriever_type='vectordb', llm='default', verbose=True)
+            self.candidates.fill(filename, vectordb, retriever_type='vectordb',
+                                 llm='default', verbose=True)
 
-    def outputs_for_each_cv(self, question: str, chain='default', llm='default', verbose=False):
-        '''Ask a question separately on each CV and return dictionary of outputs'''
+    def outputs_for_each_cv(self, question: str, fields_dict: dict, 
+                                        chain='default', llm='default', verbose=False):
+        '''Ask a question separately on each CV and return dictionary of outputs
+        Input attribute_fields specifies if fields are all part of the candidates's attributes
+        '''
         outputs = {}
-        # todo : exception
-        for filename in self.candidates.filenames():
-            output = self.ask_filtered(question, llm=llm, chain=chain, verbose=verbose)
-            outputs[filename] = output
+        for name in self.candidates.candidates_names():
+            output = self.ask_targeted(question, fields=fields_dict, name=name,
+                                       llm=llm, chain=chain, verbose=verbose)
+            outputs[name] = output
         return outputs
 
-    def ask_filtered(self, question: str, llm='default', chain='default', verbose=True):
+    def ask_targeted(self, question: str, fields_dict: dict, name: str = '',
+                                    llm='default', chain='default', verbose=True):
+        '''Return LLM's answer to a question on a targeted CV as a string
+        Targeted candidate/CV should appear either in question or as filename optional argument.
+        '''
         if llm == 'default':
             llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
         if chain == 'default':
             chain = LLMChain(llm=llm, prompt=pr_single.prompt_from_field)
-        # identify filter
-        name = treat_query.target_name(question, self.candidates.candidates_names(), 
-                                       llm=llm, verbose=verbose)
-        if verbose: print('Candidate :', name)
-        filename = self.candidates.related_file(name)
-        # identify field
-        candidates_attributes, other_fields = self.all_fields(fusion=False)
-        all_fields = candidates_attributes + other_fields
-        if verbose: print("All possible fields : ", all_fields)
-        fields = treat_query.extract_target_fields(question, all_fields, llm=llm)
+        if not name:
+            # identify filter on names
+            name = treat_query.target_name(question, self.candidates.candidates_names(), 
+                                           llm=llm, verbose=verbose)
+        filename = self.candidates.related_file(name)  # todo: case of homonym candidates
         # retrieve data
         data = []
-        for field in fields:
-            if field in candidates_attributes:
+        for field in fields_dict:
+            if fields_dict[field] == 'attribute':
                 select = self.select(field, self.candidates.name, 
-                                     f"WHERE " + self.candidates.primary_key + " = '{filename}'")
+                                     "WHERE " + self.candidates.primary_key + f" = '{filename}'")
                 data.append(select[0][0])
-            # todo : else (other_fields, ie. ask other tables)
+        # todo : elif fields_dict[field] == 'other':
+        # todo : else ask unsupervised query (llm based)
         chain = LLMChain(llm=llm, prompt=pr_single.prompt_from_field)
-        return chain.predict(topic=fields, data=data, question=question)  # lists as inputs
+        return chain.predict(topic=list(fields_dict.keys()), data=data, question=question)  # lists as inputs
     
-    # def ask_question_multi(self, query_multi: str, chain='default', llm='default') :
-    #     all_fields = self.all_fields()
-    #     try :
-    #         fields_involved = treat_query.extract_target_fields(query_multi, all_fields, llm=llm)
-    #     except Exception as err :
-    #         print(*err.args)
-    #         fields_involved = ['unknown']  # todo : plutôt [] mais à gérer dans fonctions appelées
-    #     operation = treat_query.detect_operation_from_query(query_multi, llm=llm)
-    #     if operation == 'Condition' or operation == 'Comparison' :  # Comparison is actually useless
-    #         mono_query = treat_query.multi_to_mono(query_multi)
-    #         outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, fields_involved, chain=chain, llm=llm)
-    #         selected_candidates = []
-    #         for meta in outputs :
-    #             if outputs[meta] == 'Yes' :
-    #                 selected_candidates.append(meta)
-    #         if selected_candidates == [] :
-    #             print('No candidates seem to meet the condition.')
-    #         return ", ".join(selected_candidates)
-    #     elif operation == 'All' :
-    #         mono_query = treat_query.multi_to_mono(query_multi)
-    #         outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, fields_involved, chain=chain, llm=llm)
-    #         global_output = ""
-    #         for meta in outputs :
-    #             global_output += meta + ' : ' + outputs[meta] + '\n'
-    #         return global_output
-    #     else :
-    #         print('Type of tranversal question not supported yet')
-    #         return ''
+    def ask_transverse(self, query_multi: str, fields_dict: dict, chain='default',
+                                    llm='default', verbose=True):
+        operation = treat_query.detect_operation_from_query(query_multi, llm=llm)
+        if verbose: print("Identified operation :", operation)
+        if operation == 'Condition' or operation == 'Comparison':  # Comparison is actually useless
+            mono_query = treat_query.multi_to_mono(query_multi)
+            outputs = self.outputs_for_each_cv(mono_query, fields_dict, chain=chain,
+                                               llm=llm, verbose=verbose)
+            selected_candidates = [name for name in outputs if outputs[name] == 'Yes']
+            if selected_candidates == [] :
+                print('No candidates seem to meet the condition.')
+            return ", ".join(selected_candidates)
+        elif operation == 'All' :
+            mono_query = treat_query.multi_to_mono(query_multi)
+            outputs = self.outputs_for_each_cv(mono_query, fields_dict, chain=chain,
+                                               llm=llm, verbose=verbose)
+            global_output = ""
+            for name in outputs:
+                global_output += name + ' : ' + outputs[name] + '\n'
+            return global_output
+        else :
+            print('Type of tranversal question not supported yet')
+            return ''
+        
+    def target_fields_as_dict(self, query, llm='default', verbose=True):
+        candidate_attributes, other_fields = self.all_fields(fusion=False)
+        if verbose:
+            print("All possible fields : ", *candidate_attributes, *other_fields)
+        try:
+            fields = treat_query.extract_target_fields(query, 
+                                                       candidate_attributes+other_fields,
+                                                       llm=llm)
+        except Exception as err :
+            print(*err.args)
+            fields = ['unknown']  # todo : plutôt [] mais à gérer dans fonctions appelées
+        if verbose: print("Involved fields :", fields)
+        fields_involved = {}
+        for field in fields:
+            if field in candidate_attributes:
+                fields_involved[field] = 'attribute'
+            elif field in other_fields:
+                fields_involved[field] = 'other'
+            else:
+                fields_involved[field] = 'unknown'
+                # todo: raise Exception
+        return fields_involved
+        
+    def ask_question(self, query: str, chain='default', llm='default', verbose=True) :
+        '''Identify type of query, then call auxiliary depending on type'''
+        fields_dict = self.target_fields_as_dict(query, llm=llm, verbose=verbose)
+        try:
+            mode = treat_query.detect_query_mode(query, llm=llm)
+        except Exception as err:
+            print(*err.args)
+            mode = 'unknown'
+        if verbose: print("Identified mode :", mode)
+        if mode == 'transverse':
+            return self.ask_transverse(self, query, fields_dict, chain=chain,
+                                       llm=llm, verbose=verbose)
+        elif mode == 'single':
+            # todo : exceptions
+            return self.ask_targeted(self, query, fields_dict, llm=llm, verbose=verbose)
+        else:
+            return('Mode transverse/single unclear')
