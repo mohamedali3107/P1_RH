@@ -10,6 +10,7 @@ from CVUnit import CVUnit
 from Languages import Languages
 from prompts.prompt_extract_names import prompt_name_in_query
 from prompts.prompt_format_name import prompt_identify_name
+from prompts import config_experience, config_education, config_skills
 import prompts.prompt_single_cv as pr_single
 import vectorstore_lib
 import treat_query
@@ -72,25 +73,11 @@ class CVDataBase():
             return candidates_attributes + other_fields
         else:
             return candidates_attributes, other_fields
-        
-    def is_candidate_attribute(self, fields, as_dict=False):
-        '''Return True if all in fields are candidates attributes
-        Return False if all in fields are other fields (other tables' names)
-        Return None if none of the above
-        Input fields: list or tuple of fields (str) or a single field'''
-        if not isinstance(fields, list):
-            fields = list(fields)
-        attributes, other_fields = self.all_fields(fusion=False)
-        if all([field in attributes for field in fields]):
-            return True
-        elif all([field in other_fields for field in fields]):
-            return False
-        else: return None
 
     def select(self, columns: list, table: str, condition: str = '') :
         '''Input condition: str that specifies optional ending to the select query (ex: "where...")
         Output: list of tuples of strings'''
-        cols_str = ", ".join(columns) if type(columns) == list else str(columns)
+        cols_str = ", ".join(columns) if type(columns) == list else columns
         query = f"SELECT {cols_str} FROM {table}" + " " + condition
         self.execute(query)
         return self.cursor.fetchall()
@@ -129,7 +116,8 @@ class CVDataBase():
             vectordb = vectorstore_lib.create_vectordb_single(doc)
             self.candidates.fill(filename, vectordb, retriever_type='vectordb',
                                  llm='default', verbose=True)
-            self.entities['languages'].fill(filename, vectordb, retriever_type="vectordb", llm='default', verbose=True)
+            for entity in self.entities:
+                self.entities[entity].fill(filename, vectordb, retriever_type="vectordb", llm='default', verbose=True)
 
     def outputs_for_each_cv(self, question: str, fields_dict: dict, 
                                         chain='default', llm='default', verbose=False):

@@ -24,25 +24,27 @@ class Languages():
         );""", is_entity=False)
 
 
-    def fill(self, filename, retriever_obj, retriever_type="vectordb", llm='default', print_chunks=False, verbose=True):
+    def fill(self, filename, retriever_obj, retriever_type="vectordb",
+                            llm='default', print_chunks=False, verbose=True):
 
         for field in self.dict :
             prompt_template = self.dict[field]['prompt']
             prompt = PromptTemplate(template=prompt_template, input_variables=['context'])
-            llm_output = call_to_llm.get_table_entry(retriever_obj, prompt, field, verbose=verbose, print_chunks=print_chunks, retriever_type="vectordb", llm='default')
+            llm_output = call_to_llm.get_table_entry(retriever_obj, prompt, field,
+                                                     retriever_type=retriever_type,
+                                                     verbose=verbose, print_chunks=print_chunks,
+                                                     llm=llm)
             languages_with_level = eval(llm_output)
             # todo: adapt with the methods of CVDataBase
-            self.database.select(columns=self.entity_primary_key, table=self.entity_name)
-            known_languages = [lang for sublist in self.database.cursor.fetchall() for lang in sublist]    # fetchall() returns a list of tuples (Language,)-like
+            known_languages = self.database.select(columns=self.entity_primary_key,
+                                                   table=self.entity_name)
+            known_languages = [lang[0] for lang in known_languages]    # fetchall() returns a list of tuples (Language,)-like
             print("\nKnown languages:", known_languages)
             for lang in languages_with_level:
                 language, language_level = lang
                 if language not in known_languages:
-                    # todo: replace with table.insert
-                    self.database.execute(f"""INSERT INTO languages (NameLanguage) VALUES ('{language}');""")
+                    self.entity_table.insert(self.entity_primary_key, language)
                     known_languages.append(language)
-                # todo: replace with table.insert
-                self.database.execute(f"""INSERT INTO speaks (NameLanguage, Candidate, LanguageLevel) VALUES ('{language}', '{filename}', '{language_level}');""")
-
-    def attributes(self):
-        pass
+                self.relation_table.insert([self.entity_primary_key, 'Candidate', 'LanguageLevel'],
+                                           [language, filename, language_level])
+                #self.database.execute(f"""INSERT INTO speaks (NameLanguage, Candidate, LanguageLevel) VALUES ('{language}', '{filename}', '{language_level}');""")

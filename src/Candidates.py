@@ -29,14 +29,18 @@ class Candidates() :
         # todo : exception
         return "unknown"
 
-    def fill(self, filename, retriever_obj, retriever_type="vectordb", llm='default', verbose=True):
+    def fill(self, filename, retriever_obj, retriever_type="vectordb", 
+                        print_chunks=True, llm='default', verbose=True):
         columns, values = [pr_candidates.primary_key], [filename]
         name = []
         for field in self.dict :
             prompt_template = self.dict[field]['prompt']
             prompt = PromptTemplate(template=prompt_template, input_variables=['context'])
             # todo: pass print_chunks as an argument of fill
-            answer = call_to_llm.get_table_entry(retriever_obj, prompt, field, verbose=verbose, print_chunks=True, retriever_type="vectordb", llm='default')
+            answer = call_to_llm.get_table_entry(retriever_obj, prompt, field,
+                                                 verbose=verbose, print_chunks=print_chunks,
+                                                 retriever_type=retriever_type,
+                                                 llm=llm)
             if field == pr_candidates.first_name :
                 name = [answer] + name
             if field == pr_candidates.family_name :

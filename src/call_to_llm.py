@@ -31,16 +31,21 @@ def get_result(chain, chunks, question, print_source_docs=True, print_scores=Tru
         inputs = [{"context" : context, "question" : question}]
         return chain.apply(inputs)  # list of results [{'text': '...'},...]
     
-def get_table_entry(retriever_obj, prompt, question, verbose=False, print_chunks=False, retriever_type="vectordb", llm='default'): 
+def get_table_entry(retriever_obj, prompt, topic, verbose=False, 
+                            print_chunks=False, retriever_type="vectordb", llm='default'):
+    '''Input topic is used to retrieve the chunks on which to call the LLM
+    The question is typically contained in the provided prompt
+    '''
     if llm == 'default' :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
     chain = create_chain(llm, prompt)
     ## Retrieving and calling the LLM
-    sources = vectorstore_lib.retrieving(retriever_obj, question, retriever_type="vectordb", with_scores=True)
+    sources = vectorstore_lib.retrieving(retriever_obj, topic,
+                                         retriever_type="vectordb", with_scores=True)
     context = treat_chunks.create_context_from_chunks(sources)
     answer = chain.predict(context=context)
     if verbose:
-        print(f"Asking the LLM about {question}... \n\n")
+        print(f"Asking the LLM about {topic}... \n\n")
         print("Output of the LLM:", answer, "\n")
         if print_chunks:
             print("Here are the retrieved chunks with scores:")
@@ -79,7 +84,9 @@ def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', ll
     operation = treat_query.detect_operation_from_query(query_multi, llm=llm)
     if operation == 'Condition' or operation == 'Comparison' :
         mono_query = treat_query.multi_to_mono(query_multi)
-        outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, fields_involved, chain=chain, llm=llm)
+        outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query,
+                                                             fields_involved,
+                                                             chain=chain, llm=llm)
         selected_candidates = []
         for meta in outputs :
             if outputs[meta] == 'Yes' :
@@ -89,7 +96,9 @@ def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', ll
         return ", ".join(selected_candidates)
     elif operation == 'All' :
         mono_query = treat_query.multi_to_mono(query_multi)
-        outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query, fields_involved, chain=chain, llm=llm)
+        outputs = manage_transversal_query.outputs_from_dict(dict_db, mono_query,
+                                                             fields_involved,
+                                                             chain=chain, llm=llm)
         global_output = ""
         for meta in outputs :
             global_output += meta + ' : ' + outputs[meta] + '\n'
@@ -99,7 +108,9 @@ def ask_question_multi(dict_db, query_multi, list_of_fields, chain='default', ll
         return ''
 
 def ask_question(dict_db, csv_file, all_loaded, question, chain='default', llm='default') :
-    '''Assumes all CVs to study have been loaded (ideally does not assume all fields and loads missing, todo)'''
+    '''Assumes all CVs to study have been loaded 
+    (ideally does not assume all fields and loads missing, todo)
+    '''
     print("call to ask_question")
     list_of_fields = load_from_csv.list_of_fields_csv(csv_file)
     print("fields recovered")
@@ -113,7 +124,8 @@ def ask_question(dict_db, csv_file, all_loaded, question, chain='default', llm='
     elif mode == 'single' :
         # todo : exceptions
         list_of_names = list(all_loaded.values())
-        return filtered_query.ask_filtered_query(dict_db, question, list_of_names, list_of_fields, llm=llm)
+        return filtered_query.ask_filtered_query(dict_db, question, list_of_names,
+                                                 list_of_fields, llm=llm)
     else :
         return('Mode transverse/single unclear')
     
@@ -124,5 +136,6 @@ def test_question_dico() :
     load_from_csv.load_full_csv_to_dict(csv_file, dict_db, loaded)
     print(list(loaded.values()))
     question = input("query ? ")
-    res = ask_question(dict_db, csv_file, loaded, question, chain='default', llm='default')
+    res = ask_question(dict_db, csv_file, loaded, question,
+                       chain='default', llm='default')
     print(res)

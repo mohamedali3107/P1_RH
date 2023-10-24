@@ -3,7 +3,7 @@ from copy import deepcopy
 class DBTable():
 
     def __init__(self, database, sql_query: str, is_entity: bool):
-        self.name = sql_query.split(" ")[5]  # follows 'create table if not exist'
+        self.name = sql_query.split(" ")[5]  # follows 'create table if not exists'
         self.database = database
         self.is_entity = is_entity
         database.execute(sql_query)
@@ -20,9 +20,14 @@ class DBTable():
             return [col[0] for col in cols if col[3] != 'PRI']
         
     def insert(self, columns, values):
+        '''Inputs columns and values may be lists of strings or just one string'''
+        if not isinstance(columns, list):
+            columns = [columns]
+        if not isinstance(values, list):
+            values = [values]
         columns = ", ".join(columns)
         values = "'" + "', '".join(values) + "'"
-        self.database.execute(f"""INSERT INTO candidates ({columns}) 
+        self.database.execute(f"""INSERT INTO {self.name} ({columns}) 
                                     VALUES ({values});""")
         self.database.db.commit()
         

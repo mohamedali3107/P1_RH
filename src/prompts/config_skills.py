@@ -1,4 +1,6 @@
-import prompt_candidates as candidates
+import sys
+sys.path.append("..")
+from prompts import prompt_candidates as candidates
 
 prompt_skills = """
  You will be provided with a Curriculum Vitae delimited by triple backsticks.
@@ -26,5 +28,5 @@ create_skills = "CREATE TABLE IF NOT EXISTS " + table_name
 create_skills += " (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, "
 create_skills += ', '.join([col+" "+config_dict[col]['type'] for col in config_dict])
 create_skills += f"FileName {candidates.primary_type}, "
-create_skills += f"FOREIGN KEY (FileName) REFERENCES 
+create_skills += f"""FOREIGN KEY (FileName) REFERENCES 
                         {candidates.table_name}({candidates.primary_key}) );"""
