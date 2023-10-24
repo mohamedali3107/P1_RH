@@ -32,23 +32,13 @@ class Candidates() :
         return "unknown"
 
     def fill(self, filename, retriever_obj, retriever_type="vectordb", llm='default', verbose=True):
-        if llm == 'default':
-            llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
         columns, values = [pr_candidates.primary_key], [filename]
         name = []
         for field in self.dict :
             prompt_template = self.dict[field]['prompt']
             prompt = PromptTemplate(template=prompt_template, input_variables=['context'])
-            chain = call_to_llm.create_chain(llm, prompt)   # call_to_llm un peu useless
-
-            ## Retrieving and calling the LLM
-            sources = vectorstore_lib.retrieving(retriever_obj, field, retriever_type=retriever_type, with_scores=True)
-            context = treat_chunks.create_context_from_chunks(sources)
-            answer = chain.predict(context=context)
-            if verbose:
-                print(f"Filling the {field} information... Here are the retrieved chunks with scores: \n\n")
-                treat_chunks.print_chunks(sources)
-                print(answer, "\n")
+            # todo: pass print_chunks as an argument of fill
+            answer = call_to_llm.get_table_entry(retriever_obj, prompt, field, verbose=verbose, print_chunks=True, retriever_type="vectordb", llm='default')
             if field == pr_candidates.first_name :
                 print("first name : ", answer)
                 name = [answer] + name
