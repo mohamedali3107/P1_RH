@@ -14,6 +14,7 @@ def load_files(data_dir, check_directory=None, loader_method='PyMuPDFLoader') :
     loader_method = eval(loader_method)
     docs = []
     files = utils.list_of_files(data_dir) # list of strings
+    files = [f for f in files if "pdf" in f]
     if check_directory is None :
         vectors = []
     else :
