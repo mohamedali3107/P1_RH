@@ -97,69 +97,68 @@ def demo_fill(db, data_dir, filename) -> tuple:
     docs = load.load_single_pdf(data_dir, filename)
     doc = docs[0]
     db.add_cv(doc)
-    values = db.select('*', db.candidates.name, condition=f"WHERE {db.candidates.primary_key}='{data_dir+filename}'")
-    return values[0]
+    # candidates_values and languages_values are lists corresponding to a single row, hence the [0]
+    candidates_values = db.select('*', db.candidates.name, condition=f"WHERE {db.candidates.primary_key}='{data_dir+filename}'")[0] 
+    languages_values = db.select(['NameLanguage, LanguageLevel'], db.entities['languages'].relation_name, condition=f"WHERE Candidate='{data_dir+filename}'")[0]
+    return candidates_values
 
-def run_demo(data_dir):
+def run_demo(data_dir, demo_questions):
     filenames = utils.list_of_pdf_files(data_dir)
     db = CVDataBase()
     db.initialize()
     column_names = [res[0] for res in db.select('column_name', 'information_schema.columns', condition=f"WHERE table_schema='{db.name}' AND table_name='{db.candidates.name}'")]
-    demo = gr.Interface(
-        fn = lambda filename: demo_fill(db, data_dir, filename),
-        inputs =
-        [
+    
+
+    with gr.Blocks() as demo:
+        gr.Markdown(
+            f"""
+            # Curriculum Vitae Parser
+            Using {llm_name}.
+            """)
+        with gr.Tab("Info Extraction"):
+            selected_filename = gr.Dropdown(
+                    filenames, label="File", info="Select the file you want to analyze"
+                )
+            filled_template = [gr.Textbox(label = column) for column in column_names]
+            selected_filename.change(lambda filename: demo_fill(db, data_dir, filename), selected_filename, filled_template)
+        with gr.Tab("Q&A"):
+            gr.Markdown(
+            """
+            This Q&A engine uses the information extracted beforehand from the following CVs:
+            """)
             gr.Dropdown(
-                filenames, label="File", info="Select the file you want to analyze"
-            )
-        ],
-        outputs=
-        [
-            gr.Textbox(label = column) for column in column_names
-        ],
-        description = "Analyzes a file according to the given template"
-    )
+                            filenames, label="List of CVs"
+                        )
+            with gr.Row():
+                with gr.Column():
+                    question_from_sample = gr.Dropdown(
+                            demo_questions, label="Choose a preselected question:"
+                        )
+                    answer_to_question_from_sample = gr.Textbox(label = "Answer:")
+                    question_from_sample.change(lambda query: db.ask_question(query), question_from_sample, answer_to_question_from_sample)
+                with gr.Column():
+                    user_question = gr.Textbox(
+                            label="Ask your own question:"
+                        )
+                    answer_to_user_question = gr.Textbox(label = "Answer:")
+                    question_from_sample.change(lambda query: db.ask_question(query), user_question, answer_to_user_question)
+
+    # query = demo_questions[0]
+    # print(db.ask_question(query))
     demo.launch(inbrowser=True)
     db.cursor.close()
     db.db.close()
     return
 
 if __name__ == "__main__":
-    test_classes()
+    #test_classes()
 
     ## running the gradio demo
-    #run_demo(data_dir)
-
-    ## todo: trash the following?
-    # docs, nb_files = load.load_files(data_dir, loader_method='PyMuPDFLoader')
-    # print("Files :", [doc.metadata['source'] for doc in docs])
-    # print("Done loading files")
-    # print("Creating/accessing the MySQL database...")
-    # #username = input("Enter your username : ")
-    # password = getpass.getpass("Enter your MySQL password: ")
-    # mydb = mysql.connector.connect(
-    #     host="localhost",
-    #     user="root",
-    #     password=password,
-    # )
-    # cursor = mydb.cursor()
-    # fill.initialize_database(mydb)
-    # print("Done initializing")
-    # for doc in docs:
-    #     fill.add_one_cv(cursor, doc, verbose=True)
-    #     mydb.commit()
-    # cursor.execute("SELECT FirstName, FamilyName, PhoneNumber, Email FROM candidates;")
-    # extract = cursor.fetchall()
-    # print('\nSome selected columns from the database :\n')
-    # for entry in extract :
-    #     print(*entry)
-    # print('\n')
-    #query = input("query ? ")
-    #res = call_llm_on_db.ask_filtered_query(cursor, query, list_of_names, all_fields, llm='default')
-    #print(res)
-    # cursor.execute("DESC candidates;")
-    # cols = cursor.fetchall()
-    # for col in cols :
-    #    print(col[0])
-    # cursor.close()
-    # mydb.close()
+    demo_questions = [
+    "List the phone numbers of all the candidates.",
+    "What candidates are proficient in Python?",
+    "What is the education of Léo?",
+    "What are the skills of sebastien?",
+    "What candidates speak English?"
+    ]
+    run_demo(data_dir, demo_questions=demo_questions)
