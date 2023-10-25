@@ -10,7 +10,9 @@ from CVUnit import CVUnit
 from Languages import Languages
 from prompts.prompt_extract_names import prompt_name_in_query
 from prompts.prompt_format_name import prompt_identify_name
-from prompts import config_experience, config_education, config_skills
+from prompts import config_experience as experience
+from prompts import config_education as education
+from prompts import config_skills as skills
 import prompts.prompt_single_cv as pr_single
 import vectorstore_lib
 import treat_query
@@ -44,6 +46,13 @@ class CVDataBase():
         self.db.database = self.name
         self.candidates = Candidates(self)  # table creation
         self.entities['languages'] = Languages(self)
+        print(education.sql_create)
+        self.entities[education.table_name] = CVUnit(self, education.sql_create,
+                                                     education.config_dict)
+        self.entities[experience.table_name] = CVUnit(self, experience.sql_create,
+                                                      experience.config_dict)
+        self.entities[skills.table_name] = CVUnit(self, skills.sql_create,
+                                                  skills.config_dict)
         # todo : other calls to other constructors 
         if verbose:
             tables = self.list_tables()
@@ -117,7 +126,8 @@ class CVDataBase():
             self.candidates.fill(filename, vectordb, retriever_type='vectordb',
                                  llm='default', verbose=True)
             for entity in self.entities:
-                self.entities[entity].fill(filename, vectordb, retriever_type="vectordb", llm='default', verbose=True)
+                self.entities[entity].fill(filename, vectordb, 
+                                           retriever_type="vectordb", llm='default', verbose=True)
 
     def outputs_for_each_cv(self, question: str, fields_dict: dict, 
                                         chain='default', llm='default', verbose=False):
@@ -154,11 +164,19 @@ class CVDataBase():
             if fields_dict[field] == 'attribute':
                 select = self.select(field, self.candidates.name, 
                                      "WHERE " + self.candidates.primary_key + f" = '{filename}'")
-                data.append(select[0][0])
-        # todo : elif fields_dict[field] == 'other':
-        # todo : else ask unsupervised query (llm based)
+                data.append("<" + field + ">  " + select[0][0])
+            elif fields_dict[field] == 'other':
+                entity = self.entities[field]
+                cols = entity.attributes()
+                piece = "<" + field + "> "
+                for col in cols :
+                    select = self.select(col, entity.name,
+                                     "WHERE " + self.candidates.primary_key + f" = '{filename}'")
+                    piece += " " + col + ": " + select[0][0] + " -"
+                    data.append(piece)
+            # todo: else ask unsupervised query (llm based)
         chain = LLMChain(llm=llm, prompt=pr_single.prompt_from_field)
-        return chain.predict(topic=list(fields_dict.keys()), data=data, question=question)  # lists as inputs
+        return chain.predict(topic=list(fields_dict.keys()), data=data, question=question)
     
     def ask_transverse(self, query_multi: str, fields_dict: dict, chain='default',
                                     llm='default', verbose=True):

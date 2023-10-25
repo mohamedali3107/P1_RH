@@ -11,12 +11,13 @@ from langchain.prompts import PromptTemplate
 class CVUnit():
     '''Entities education, experience, skills'''
 
-    def __init__(self, database, entity_name: str, sql_query: str):
+    def __init__(self, database, sql_query: str, config_dict: dict):
         self.database = database
-        self.name = entity_name
-        self.entity = DBTable(self.name, sql_query)
+        self.dict = config_dict  # contains columns except primary and foreign key Candidate
+        self.entity = DBTable(self.database, sql_query, is_entity=True)
+        self.name = self.entity.name
 
-    def fill(self, filename, retriever_obj, prompt_template, 
+    def fill(self, filename, retriever_obj,
                         retriever_type="vectordb", llm='default', verbose=True):
         if llm == 'default':
             llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
@@ -24,10 +25,16 @@ class CVUnit():
         if verbose:
             print(f"Filling the {self.name} information... \n\n")
         ## Retrieving and calling the LLM
-        prompt = PromptTemplate(template=prompt_template, input_variables=['context'])
-        answer = call_to_llm.get_table_entry(retriever_obj, prompt, field,
-                                             verbose=verbose, print_chunks=True,
-                                             retriever_type=retriever_type, llm=llm)
-        cols = self.table.columns(include_primary=False)
-        # todo: generalize for when there will be more columns
-        self.table.insert(cols, [answer, filename])
+        outputs = []
+        for col in self.dict:
+            prompt = PromptTemplate(template=self.dict[col]['prompt'], input_variables=['context'])
+            answer = call_to_llm.get_table_entry(retriever_obj, prompt, field+' '+col,
+                                                 verbose=verbose, print_chunks=True,
+                                                 retriever_type=retriever_type, llm=llm)
+            outputs.append(answer)
+        cols = self.entity.columns(include_primary=False)  # includes foreign key Candidate
+        self.entity.insert(cols, outputs + [filename])
+
+    def attributes(self):
+        '''Return columns except for numeric id and foreign key'''
+        return list(self.dict.keys())
