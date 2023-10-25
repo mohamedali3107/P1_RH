@@ -34,3 +34,7 @@ class CVUnit():
             outputs.append(answer)
         cols = self.entity.columns(include_primary=False)  # includes foreign key Candidate
         self.entity.insert(cols, outputs + [filename])
+
+    def attributes(self):
+        '''Return columns except for numeric id and foreign key'''
+        return list(self.dict.keys())

@@ -164,9 +164,17 @@ class CVDataBase():
             if fields_dict[field] == 'attribute':
                 select = self.select(field, self.candidates.name, 
                                      "WHERE " + self.candidates.primary_key + f" = '{filename}'")
-                data.append(select[0][0])
-        # todo : elif fields_dict[field] == 'other':
-        # todo : else ask unsupervised query (llm based)
+                data.append("<" + field + ">  " + select[0][0])
+            elif fields_dict[field] == 'other':
+                entity = self.entities[field]
+                cols = entity.attributes()
+                piece = "<" + field + "> "
+                for col in cols :
+                    select = self.select(col, entity.name,
+                                     "WHERE " + self.candidates.primary_key + f" = '{filename}'")
+                    piece += " " + col + ": " + select[0][0] + " -"
+                    data.append(piece)
+            # todo: else ask unsupervised query (llm based)
         chain = LLMChain(llm=llm, prompt=pr_single.prompt_from_field)
         return chain.predict(topic=list(fields_dict.keys()), data=data, question=question)
     
