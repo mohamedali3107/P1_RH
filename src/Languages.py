@@ -35,7 +35,7 @@ class Languages():
                                                      verbose=verbose, print_chunks=print_chunks,
                                                      llm=llm)
             languages_with_level = eval(llm_output)
-            # todo: adapt with the methods of CVDataBase
+            
             known_languages = self.database.select(columns=self.entity_primary_key,
                                                    table=self.entity_name)
             known_languages = [lang[0] for lang in known_languages]    # fetchall() returns a list of tuples (Language,)-like

@@ -194,25 +194,25 @@ if __name__ == "__main__":
     print("Done loading files")
 
     ## Testing the language prompt
-#     prompt_template = pr_languages.template
-#     prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
-# #    test_prompt(docs[0], prompt, "languages")
-#     for doc in docs:
-#         test_prompt(doc, prompt, "languages", print_chunks=False)
+    prompt_template = pr_languages.template
+    prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
+    test_prompt(docs[5], prompt, "languages")
+    # for doc in docs:
+    #     test_prompt(doc, prompt, "languages", print_chunks=False)
 
-    print("Creating/accessing the MySQL database...")
-    password = getpass.getpass("Enter your MySQL password: ")
-    mydb = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password=password,
-    )
-    cursor = mydb.cursor()
-    initialize_database(mydb)
-    print("Done initializing")
-    for doc in docs:
-        add_one_cv(cursor, doc, verbose=True)
-        mydb.commit()
-    test_filling(cursor)
-    cursor.close()
-    mydb.close()
+    # print("Creating/accessing the MySQL database...")
+    # password = getpass.getpass("Enter your MySQL password: ")
+    # mydb = mysql.connector.connect(
+    #     host="localhost",
+    #     user="root",
+    #     password=password,
+    # )
+    # cursor = mydb.cursor()
+    # initialize_database(mydb)
+    # print("Done initializing")
+    # for doc in docs:
+    #     add_one_cv(cursor, doc, verbose=True)
+    #     mydb.commit()
+    # test_filling(cursor)
+    # cursor.close()
+    # mydb.close()
