@@ -9,6 +9,7 @@ import fill_mysqldb as fill
 import loading.load_pdf as load
 import call_llm_on_db
 from CVDataBase import CVDataBase
+import gradio as gr
 
 import os
 import openai
@@ -18,6 +19,7 @@ openai.api_key  = os.environ['OPENAI_API_KEY']
 
 
 # todo : faire autrement !
+# par exemple : all_fields = db.select('column_name', 'information_schema.columns', condition=f"WHERE table_schema='{db.name}' AND table_name='{db.candidates.name}'")
 all_fields = ["FileName"
 "FirstName",
 "FamilyName",
@@ -91,9 +93,44 @@ def test_classes():
     db.cursor.close()
     db.db.close()
 
+def demo_fill(db, data_dir, filename) -> tuple:
+    docs = load.load_single_pdf(data_dir, filename)
+    doc = docs[0]
+    db.add_cv(doc)
+    values = db.select('*', db.candidates.name, condition=f"WHERE {db.candidates.primary_key}='{data_dir+filename}'")
+    return values[0]
+
+def run_demo(data_dir):
+    filenames = utils.list_of_pdf_files(data_dir)
+    db = CVDataBase()
+    db.initialize()
+    column_names = [res[0] for res in db.select('column_name', 'information_schema.columns', condition=f"WHERE table_schema='{db.name}' AND table_name='{db.candidates.name}'")]
+    demo = gr.Interface(
+        fn = lambda filename: demo_fill(db, data_dir, filename),
+        inputs =
+        [
+            gr.Dropdown(
+                filenames, label="File", info="Select the file you want to analyze"
+            )
+        ],
+        outputs=
+        [
+            gr.Textbox(label = column) for column in column_names
+        ],
+        description = "Analyzes a file according to the given template"
+    )
+    demo.launch(inbrowser=True)
+    db.cursor.close()
+    db.db.close()
+    return
 
 if __name__ == "__main__":
     test_classes()
+
+    ## running the gradio demo
+    #run_demo(data_dir)
+
+    ## todo: trash the following?
     # docs, nb_files = load.load_files(data_dir, loader_method='PyMuPDFLoader')
     # print("Files :", [doc.metadata['source'] for doc in docs])
     # print("Done loading files")
