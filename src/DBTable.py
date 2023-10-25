@@ -6,7 +6,7 @@ class DBTable():
         self.name = sql_query.split(" ")[5]  # follows 'create table if not exists'
         self.database = database
         self.is_entity = is_entity
-        database.execute(sql_query)
+        self.database.execute(sql_query)
         self.database.execute("DESC " + self.name)
         self.cols = self.database.cursor.fetchall()
 

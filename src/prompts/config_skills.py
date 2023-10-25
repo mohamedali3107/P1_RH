@@ -24,9 +24,9 @@ table_name = 'skills'
 sql_type = "varchar(700)"
 config_dict = {'EducationSummary': {'prompt': prompt_skills, 'type': sql_type}}
 
-create_skills = "CREATE TABLE IF NOT EXISTS " + table_name
-create_skills += " (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, "
-create_skills += ', '.join([col+" "+config_dict[col]['type'] for col in config_dict])
-create_skills += f"FileName {candidates.primary_type}, "
-create_skills += f"""FOREIGN KEY (FileName) REFERENCES 
+sql_create = "CREATE TABLE IF NOT EXISTS " + table_name
+sql_create += " (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, "
+sql_create += ', '.join([col+" "+config_dict[col]['type'] for col in config_dict])
+sql_create += f", FileName {candidates.primary_type}, "
+sql_create += f"""FOREIGN KEY (FileName) REFERENCES 
                         {candidates.table_name}({candidates.primary_key}) );"""
