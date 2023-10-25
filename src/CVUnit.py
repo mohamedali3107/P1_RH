@@ -11,11 +11,18 @@ from langchain.prompts import PromptTemplate
 class CVUnit():
     '''Entities education, experience, skills'''
 
-    def __init__(self, database, sql_query: str, config_dict: dict):
+    def __init__(self, database, sql_query: str, config_dict: dict, sql_query_relation: str = ''):
         self.database = database
         self.dict = config_dict  # contains columns except primary and foreign key Candidate
-        self.entity = DBTable(self.database, sql_query, is_entity=True)
-        self.name = self.entity.name
+        self.entity_table = DBTable(self.database, sql_query, is_entity=True)
+        self.entity_name = self.entity_table.name
+        self.has_relation = bool(sql_query_relation)
+        if self.has_relation:
+            self.relation_table = DBTable(self.database, sql_query_relation, is_entity=False)
+            self.entity_name = self.relation_table.name
+        else:
+            self.relation_table = ''
+            self.relation_name = ''
 
     def fill(self, filename, retriever_obj,
                         retriever_type="vectordb", llm='default', verbose=True):
@@ -35,6 +42,9 @@ class CVUnit():
         cols = self.entity.columns(include_primary=False)  # includes foreign key Candidate
         self.entity.insert(cols, outputs + [filename])
 
-    def attributes(self):
+    def attributes(self, include_relation=False):
         '''Return columns except for numeric id and foreign key'''
-        return list(self.dict.keys())
+        attrib = self.entity_table.columns(include_primary=False)
+        if self.has_relation and include_relation:
+            attrib.extend(self.relation_table.columns(include_primary=False))
+        return attrib

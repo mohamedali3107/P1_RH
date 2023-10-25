@@ -67,17 +67,20 @@ class CVDataBase():
     def execute(self, sql_query: str):
         self.cursor.execute(sql_query)
 
-    def list_tables(self, except_candidates=False):
-        self.execute("SHOW TABLES")
-        tables = self.cursor.fetchall()
-        if except_candidates:
-            return [table[0] for table in tables if table[0] != self.candidates.name]
-        else:
-            return [table[0] for table in tables]
+    def list_tables(self, except_candidates=False, except_relations=False):
+        if not except_candidates and not except_relations:
+            self.execute("SHOW TABLES")
+            return [table[0] for table in self.cursor.fetchall()]
+        tables = [entity.entity_name for entity in self.entities.values()]
+        if not except_candidates:
+            tables.append(self.candidates.name)
+        if not except_relations:
+            tables.extend([entity.relation_name for entity in self.entities.values()])
+        return tables
 
     def all_fields(self, fusion=True):
         candidates_attributes = self.candidates.attributes()
-        other_fields = self.list_tables(except_candidates=True)
+        other_fields = self.list_tables(except_candidates=True, except_relations=True)
         if fusion:
             return candidates_attributes + other_fields
         else:
@@ -167,13 +170,23 @@ class CVDataBase():
                 data.append("<" + field + ">  " + select[0][0])
             elif fields_dict[field] == 'other':
                 entity = self.entities[field]
-                cols = entity.attributes()
                 piece = "<" + field + "> "
-                for col in cols :
-                    select = self.select(col, entity.name,
-                                     "WHERE " + self.candidates.primary_key + f" = '{filename}'")
-                    piece += " " + col + ": " + select[0][0] + " -"
-                    data.append(piece)
+                if entity.has_relation:
+                    cols = entity.attributes(include_relation=True)  # no int primary key nor FileName
+                    cols = [col for col in cols if col != self.candidates.primary_key]
+                    cols_str = ", ".join([col for col in cols])
+                    self.execute(f"""SELECT {cols_str} FROM (SELECT * FROM {entity.entity_name}
+                                            NATURAL JOIN {entity.relation_name}) AS TEMP
+                                            WHERE {self.candidates.primary_key} = '{filename}';""")
+                    select = self.cursor.fetchall()
+                else:
+                    cols = entity.attributes()
+                    cols = [col for col in cols if col != self.candidates.primary_key]
+                    select = self.select(cols, entity.entity_name,
+                                            "WHERE " + self.candidates.primary_key + f" = '{filename}'")
+                for output in select:
+                    piece += "\n " + " - ".join([cols[i] + ": " + str(output[i]) for i in range(len(cols))]) + " ;\n"
+                data.append(piece)
             # todo: else ask unsupervised query (llm based)
         chain = LLMChain(llm=llm, prompt=pr_single.prompt_from_field)
         return chain.predict(topic=list(fields_dict.keys()), data=data, question=question)

@@ -17,7 +17,8 @@ class DBTable():
         else:
             if include_primary:
                 return [col[0] for col in cols]
-            return [col[0] for col in cols if col[3] != 'PRI']
+            # else exclude artificial primary key of type int
+            return [col[0] for col in cols if col[3] != 'PRI' or col[1] != 'int']
         
     def insert(self, columns, values):
         '''Inputs columns and values may be lists of strings or just one string'''

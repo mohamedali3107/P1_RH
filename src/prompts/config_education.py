@@ -45,8 +45,8 @@ config_dict = {'Summary': {'prompt': prompt_education, 'type': sql_type}}
 sql_create = "CREATE TABLE IF NOT EXISTS " + table_name
 sql_create += " (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, "
 sql_create += ', '.join([col+" "+config_dict[col]['type'] for col in config_dict])
-sql_create += f", FileName {candidates.primary_type}, "
-sql_create += f"""FOREIGN KEY (FileName) REFERENCES 
+sql_create += f", {candidates.primary_key} {candidates.primary_type}, "
+sql_create += f"""FOREIGN KEY ({candidates.primary_key}) REFERENCES 
                         {candidates.table_name}({candidates.primary_key}) );"""
 
 
