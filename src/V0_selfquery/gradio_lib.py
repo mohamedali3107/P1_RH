@@ -1,5 +1,5 @@
-import call_to_llm
 from itertools import chain
+import treat_chunks
 
 def format_for_gradio(prompt, question, answer, with_source=True, print_prompt=True, chunks=[]): 
     '''Input: A natural (non prompt-engineered) question and a boolean indicating whether or not to print the source
@@ -12,7 +12,7 @@ def format_for_gradio(prompt, question, answer, with_source=True, print_prompt=T
     nb_chunks = len(chunks)
 
     # Stacking the relevant chunks into a context string
-    context = call_to_llm.create_context_from_chunks(chunks)
+    context = treat_chunks.create_context_from_chunks(chunks)
 
     # Building the prompt
     exact_prompt = prompt.format(context=context, question=question)

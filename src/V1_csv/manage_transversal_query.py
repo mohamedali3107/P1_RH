@@ -1,3 +1,6 @@
+
+import sys
+sys.path.append("..")
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
 # my modules

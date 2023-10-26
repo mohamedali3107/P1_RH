@@ -1,7 +1,4 @@
 from DBTable import DBTable
-from prompts import prompt_candidates as pr_candidates
-import treat_chunks
-import vectorstore_lib
 import call_to_llm
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate

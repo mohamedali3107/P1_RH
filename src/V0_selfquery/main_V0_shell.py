@@ -1,17 +1,18 @@
 import subprocess
 import sys
+sys.path.append("..")
 from langchain.text_splitter import RecursiveCharacterTextSplitter #TokenTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from langchain.chains.query_constructor.base import AttributeInfo
-from langchain.prompts import PromptTemplate
-# my modules 
-import loading_preprocessing_multi
-import load_pdf
+from langchain.chains import LLMChain
+# my modules
+from loading import load_pdf
+from loading import utils
 import vectorstore_lib
 import prompts.prompt_multi_cv as pr_multi
-import call_to_llm
+import call_to_llm_V0 as call_to_llm
 
 import os
 import openai
@@ -21,8 +22,8 @@ openai.api_key  = os.environ['OPENAI_API_KEY']
 
 ########## Parameters ##########
 
-data_dir = '../data/'
-persist_directory = '../chroma_multi/'
+data_dir = '../../data/'
+persist_directory = '../../chroma_multi/'
 
 ## Loader :
 loader_method = 'PyMuPDFLoader'
@@ -56,7 +57,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'clean' :
 
 ## Vectorstore creation
 docs, nb_files = load_pdf.load_files(data_dir, 
-                                    persist_directory=persist_directory, 
+                                    check_directory=persist_directory, 
                                     loader_method=loader_method
                                     )
 vectordb, list_of_names_as_str = vectorstore_lib.create_vector_db(docs, 
@@ -71,7 +72,7 @@ vectordb, list_of_names_as_str = vectorstore_lib.create_vector_db(docs,
 metadata_field_info = [
     AttributeInfo(
         name="source",
-        description="The source CV the document is from, should be one of " + loading_preprocessing_multi.list_of_files_as_str(data_dir),
+        description="The source CV the document is from, should be one of " + utils.list_of_files_as_str(data_dir),
         type="string",
      ),
     AttributeInfo(
@@ -95,7 +96,7 @@ retriever_obj = retriever_with_filter
 
 ## Prepare chain with prompt template
 prompt_multi = pr_multi.prompt  # generic multi CV, see external file
-chain = call_to_llm.create_chain(llm,  prompt_multi)
+chain = LLMChain(llm=llm, prompt=prompt_multi)
 
 ######### Main loop #########
 

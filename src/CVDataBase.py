@@ -1,23 +1,20 @@
 import time
 import getpass
-import subprocess
 import mysql.connector
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
-import sql_queries as sql
 from Candidates import Candidates
 from CVUnit import CVUnit
 from Languages import Languages
 from prompts.prompt_extract_names import prompt_name_in_query
 from prompts.prompt_format_name import prompt_identify_name
-from prompts import config_experience as experience
-from prompts import config_education as education
-from prompts import config_skills as skills
+from config_database_mysql import config_experience as experience
+from config_database_mysql import config_education as education
+from config_database_mysql import config_skills as skills
+from config_database_mysql import config_candidates
 import prompts.prompt_single_cv as pr_single
 import vectorstore_lib
 import treat_query
-import prompts.prompt_candidates as pr_candidates
-import manage_transversal_query
 
 class CVDataBase():
 
@@ -118,7 +115,8 @@ class CVDataBase():
             print("CV already parsed.")
             ## recover the candidate's name
             if filename not in self.candidates.files_names:
-                first_name_label, family_name_label = pr_candidates.first_name, pr_candidates.family_name
+                first_name_label = config_candidates.first_name
+                family_name_label = config_candidates.family_name
                 name = self.select([first_name_label, family_name_label], 
                                     self.candidates.name,
                                     f"WHERE {self.candidates.primary_key} = '{filename}'")

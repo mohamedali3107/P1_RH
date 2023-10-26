@@ -2,7 +2,7 @@ from DBTable import DBTable
 from CVUnit import CVUnit
 import call_to_llm
 from prompts import prompt_languages as pr_languages
-from prompts import config_languages as languages
+from config_database_mysql import config_languages as languages
 from langchain.prompts import PromptTemplate
 
 class Languages(CVUnit):

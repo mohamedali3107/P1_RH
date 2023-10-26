@@ -1,3 +1,5 @@
+import sys
+sys.path.append("..")
 from dotenv import load_dotenv, find_dotenv
 import pandas as pd
 import gradio as gr

@@ -1,5 +1,6 @@
 import subprocess
 import sys
+sys.path.append("..")
 from langchain.text_splitter import RecursiveCharacterTextSplitter #TokenTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
@@ -7,10 +8,11 @@ from langchain.retrievers.self_query.base import SelfQueryRetriever
 from langchain.chains.query_constructor.base import AttributeInfo
 import gradio as gr
 from itertools import chain as chain_list
+from langchain.chains import LLMChain
 # my modules
 import vectorstore_lib
 import prompts.prompt_multi_cv as pr_multi
-import call_to_llm
+import call_to_llm_V0 as call_to_llm
 import gradio_lib
 import loading.load_pdf as load_pdf
 import loading.utils as utils
@@ -25,8 +27,8 @@ openai.api_key  = os.environ['OPENAI_API_KEY']
 
 ########## Parameters ##########
 
-data_dir = '../data/'
-persist_directory = '../chroma_multi/'
+data_dir = '../../data/'
+persist_directory = '../../chroma_multi/'
 
 ## Loader :
 loader_method = 'PyMuPDFLoader'
@@ -101,7 +103,7 @@ prompt = pr_multi.prompt  # generic multi CV, see external file
 
 def fn_gradio_QA(question, with_source, print_prompt) :
     '''Assumes : retriever_obj, prompt, llm (kinda dirty)'''
-    chain = call_to_llm.create_chain(llm, prompt)
+    chain = LLMChain(llm=llm, prompt=prompt)
     chunks = vectorstore_lib.retrieving(retriever_obj, question, retriever_type=retriever_type, with_scores=False)
     answer = call_to_llm.get_result(chain, chunks, question, print_source_docs=False, print_scores=False)
     return gradio_lib.format_for_gradio(prompt, question, answer, with_source=with_source, print_prompt=print_prompt, chunks=chunks)

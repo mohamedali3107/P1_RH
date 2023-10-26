@@ -1,3 +1,5 @@
+import sys
+sys.path.append("..")
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
 import prompts.prompt_extract_names as prompt_extract_names

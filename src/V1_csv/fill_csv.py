@@ -1,3 +1,5 @@
+import sys
+sys.path.append("..")
 import os
 import openai
 from dotenv import load_dotenv, find_dotenv
@@ -5,9 +7,9 @@ import pandas as pd
 import subprocess
 import time
 import vectorstore_lib
-import call_to_llm
 import treat_chunks
 
+from langchain.chains import LLMChain
 from langchain.document_loaders import PyMuPDFLoader
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -78,7 +80,7 @@ def fill_one_row(template_path, file, force_refill, save=False, verbose=False):
             ## Prepare chain with prompt template
             prompt_template = prompts_df[field][0]
             prompt = PromptTemplate(template=prompt_template, input_variables=["context"])
-            chain = call_to_llm.create_chain(llm, prompt)
+            chain = LLMChain(llm=llm, prompt=prompt)
 
             ## Retrieving and calling the LLM
             sources = vectorstore_lib.retrieving(retriever_obj, field, retriever_type="vectordb", with_scores=True)

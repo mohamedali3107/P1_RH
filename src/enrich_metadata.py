@@ -60,6 +60,3 @@ def find_name_in_CV(doc, llm='default') :
     inputs = [{"context" : context}]
     output = chain.apply(inputs)[0]['text']
     return output
-
-def add_metadata(docs, query) :
-    return

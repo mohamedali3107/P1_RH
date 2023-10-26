@@ -3,11 +3,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
 # my modules 
 import loading.utils as utils
-import getpass
-import mysql.connector
-import fill_mysqldb as fill
 import loading.load_pdf as load
-import call_llm_on_db
 from CVDataBase import CVDataBase
 import gradio as gr
 

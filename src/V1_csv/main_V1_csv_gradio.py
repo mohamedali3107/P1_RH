@@ -1,5 +1,6 @@
 import subprocess
 import sys
+sys.path.append("..")
 from langchain.text_splitter import RecursiveCharacterTextSplitter #TokenTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
