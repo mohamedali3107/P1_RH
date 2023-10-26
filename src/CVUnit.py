@@ -28,9 +28,9 @@ class CVUnit():
                         retriever_type="vectordb", llm='default', verbose=True):
         if llm == 'default':
             llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
-        field = self.name
+        field = self.entity_name
         if verbose:
-            print(f"Filling the {self.name} information... \n\n")
+            print(f"Filling the {self.entity_name} information... \n\n")
         ## Retrieving and calling the LLM
         outputs = []
         for col in self.dict:
@@ -39,8 +39,8 @@ class CVUnit():
                                                  verbose=verbose, print_chunks=True,
                                                  retriever_type=retriever_type, llm=llm)
             outputs.append(answer)
-        cols = self.entity.columns(include_primary=False)  # includes foreign key Candidate
-        self.entity.insert(cols, outputs + [filename])
+        cols = self.entity_table.columns(include_primary=False)  # includes foreign key Candidate
+        self.entity_table.insert(cols, outputs + [filename])
 
     def attributes(self, include_relation=False):
         '''Return columns except for numeric id and foreign key'''
