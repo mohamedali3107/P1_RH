@@ -43,7 +43,7 @@ Professional experience of the person:
 
 table_name = 'experience'
 sql_type = "varchar(700)"
-config_dict = {'EducationSummary': {'prompt': prompt_experience, 'type': sql_type}}
+config_dict = {'Summary': {'prompt': prompt_experience, 'type': sql_type}}
 
 sql_create = "CREATE TABLE IF NOT EXISTS " + table_name
 sql_create += " (id INT PRIMARY KEY NOT NULL AUTO_INCREMENT, "
