@@ -1,3 +1,5 @@
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.embeddings.openai import OpenAIEmbeddings
 import subprocess
 from langchain.vectorstores import Chroma
 # my modules
@@ -11,6 +13,28 @@ def new_vectordb(chunks, embedding, persist_directory) :
         documents=chunks,
         embedding=embedding,
         persist_directory=persist_directory
+    )
+    return vectordb
+
+def create_vectordb_single(doc, splitter='default', embedding='default', persist_directory='default'):
+    ## Default parameters
+    if splitter == 'default':
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=600,
+            chunk_overlap=100, 
+            separators=["\n\n", "\n", " ", ""]
+        )
+    if embedding == 'default':
+        embedding = OpenAIEmbeddings()
+    if persist_directory == 'default':
+        subprocess.run('mkdir ' + "../chroma", shell=True)  # may pre-exist
+        filename = doc.metadata['source'].split('/')[-1]
+        persist_directory = "../chroma/" + filename
+        subprocess.run('mkdir ' + persist_directory, shell=True)  # may pre-exist
+    chunks = splitting_of_docs([doc], splitter)  # todo : splitter.split_document(?)(doc)
+    vectordb = new_vectordb(chunks, 
+                            embedding, 
+                            persist_directory
     )
     return vectordb
 

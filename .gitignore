@@ -1,6 +1,7 @@
 .env
 test.py
-*.txt
+*.DS_Store
+data/*
 *.pdf
 *.zip
 __pycache__/*

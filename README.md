@@ -29,6 +29,8 @@
 -->
 
 
+Todo: USAGE + data + enhance description.
+
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
@@ -39,41 +41,25 @@ This project is done in the context of the Digital Tech year Fall 2023 and consi
 
 The method is coded and Python and makes use of LangChain pipelines with GTP-3.5 running. 
 
-
 ## Getting Started
-
-
-### Prerequisites
-
-  ```sh
-langchain
-python-dotenv
-openai
-chardet
-cchardet
-chromadb
-tiktoken
-pymupdf
-gradio
-mysql-connector-python
-  ```
 
 ### Installation
 
 1. Get a OpenAI API Key at [https://platform.openai.com](https://platform.openai.com)
-2. Clone the repo
+2. Clone the repo:
    ```sh
    git clone https://github.com/falque/P1_RH.git
    ```
-3. Install Python packages
+3. Install required Python packages:
    ```sh
-   pip install requirements.txt
+   pip install -r requirements.txt
    ```
-4. Create a .env file with your OpenAI API Key where you cloned the repo
+4. Create a .env file with your OpenAI API Key in the folder where you cloned the repo:
    ```sh
    touch .env
-   OPENAI_API_KEY="ENTER YOUR API KEY"
+   echo "OPENAI_API_KEY=YOUR_OPENAI_API_KEY" >> .env
    ```
+   where YOUR_OPENAI_API_KEY should be replaced by the key you got from OpenAI.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -81,7 +67,7 @@ mysql-connector-python
 <!-- REPO STRUCTURE -->
 ## Repo structure
 
-Main demo scripts can be found in ./src, utilities and loading methods are located in ./src/loading. Prompt templates to be fed to the LLM for each task are located in the .src/prompts folder.
+Main demo scripts can be found in ./src, utilities and loading methods are located in ./src/loading. Promptq to be fed to the LLM for each task are located in the .src/prompts folder.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -90,11 +76,10 @@ Main demo scripts can be found in ./src, utilities and loading methods are locat
 
 1. Connect to MySQL
 2. Add the CVs to be parsed to a new ./data folder
-3. [Optiona] Run .src/fill_mysqldb.py to fill the database with the info parsed from the CVs
+3. [Optional] Run .src/fill_mysqldb.py to fill the database with the info parsed from the CVs
 4. Run multi_gradio to ask questions on your pool of CVs
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- ROADMAP -->
@@ -119,8 +104,6 @@ See the [open issues](https://github.com/othneildrew/Best-README-Template/issues
 Mohammed Ali Belloum, Justine Falque, Sébastien Tran Tien, Emmanuel Zongo
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
 
 <!-- CONTACT -->
 ## Contact

@@ -13,7 +13,7 @@ def load_files(data_dir, check_directory=None, loader_method='PyMuPDFLoader') :
     # todo: re organize this into two separated functions
     loader_method = eval(loader_method)
     docs = []
-    files = utils.list_of_files(data_dir) # list of strings
+    files = utils.list_of_pdf_files(data_dir) # list of strings
     if check_directory is None :
         vectors = []
     else :
@@ -32,7 +32,26 @@ def load_files(data_dir, check_directory=None, loader_method='PyMuPDFLoader') :
         assert len(docs) == len(files)  # tout moche
     return docs, len(files)  # all pages, nb_files
 
-def merge_doubles_in_list_docs(docs):
+def load_single_pdf(data_dir, filename, check_directory=None, loader_method='PyMuPDFLoader') :
+    # adapted from the above load_files function
+    loader_method = eval(loader_method)
+    docs = []
+    if check_directory is None :
+        vectors = []
+    else :
+        try :
+            vectors = utils.list_of_files(check_directory)
+        except FileNotFoundError : # probably a first run, directory not created yet
+            vectors = []
+    if len(vectors) == 0 :  # initial filling of database
+        loaders = [loader_method(data_dir+filename)]
+        for loader in loaders:
+            docs.extend(loader.load())   # chaque doc a plusieurs pages, chacune a des metadonnées
+            # extend recolle 2 listes en une, donc c'est une liste de toutes les pages
+    docs = merge_doubles_in_list_docs(docs) # affectation is not actually necessary
+    return docs
+
+def merge_doubles_in_list_docs(docs) :
     if len(docs) > 0 :
         prec = docs[0]
     i = 1

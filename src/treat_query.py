@@ -14,7 +14,9 @@ def multi_to_mono(query_multi, llm='default', verbose=False) :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
     prompt_multi_to_mono = prompt_mono_from_multi.prompt_template
     chain_to_mono_query = LLMChain(llm=llm, prompt=prompt_multi_to_mono)
-    return chain_to_mono_query.predict(question=query_multi)
+    mono_query = chain_to_mono_query.predict(question=query_multi)
+    if verbose: print("Mono query :", mono_query)
+    return mono_query
 
 def extract_target_fields(query, list_of_fields, llm='default', verbose=True) :
     '''Determine what field is targeted by a query, among a list of possible fields'''
@@ -29,8 +31,7 @@ def extract_target_fields(query, list_of_fields, llm='default', verbose=True) :
     if identified_fields[0] not in list_of_fields :  # todo : sublist
         raise Exception('extract_target_fields output is none of expected', list_of_fields, 
                         '\ninput = "' + query + '"', '\noutput = "' + identified_fields + '"')
-    if verbose :
-        print("Identified field(s) :", *identified_fields)
+    if verbose: print("Identified topic(s) :", *identified_fields)
     return identified_fields
 
 def detect_query_mode(question, llm='default', verbose=True) :
@@ -42,8 +43,7 @@ def detect_query_mode(question, llm='default', verbose=True) :
         raise Exception('detect_query_mode did not provide expected output', 
                         '\nquery = "' + question + '"', '\noutput = "' + mode + '"')
     else :
-        if verbose :
-            print("Identified mode of query :", mode)
+        if verbose: print("Detected mode :", mode)
         return mode
 
 def detect_operation_from_query(question, llm='default', verbose=True) :
@@ -55,8 +55,7 @@ def detect_operation_from_query(question, llm='default', verbose=True) :
         raise Exception('detect_operation_from_query did not provide expected output', 
                         '\nquery = "' + question + '"', '\noutput = "' + operation + '"')
     else:
-        if verbose :
-            print("Identified type of transverse query :", operation)
+        if verbose: print("Detected operation :", operation)
         return operation
     
 def extract_name(query, llm='default', verbose=False) :
@@ -64,8 +63,7 @@ def extract_name(query, llm='default', verbose=False) :
         llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0)
     llm_chain = LLMChain(prompt=prompt_extract_names.prompt_name_in_query, llm=llm)
     name = llm_chain.predict(context=query)
-    if verbose :
-        print("Name as extracted :", name)
+    if verbose : print("Name as extracted :", name)
     return name
     
 def identify_name(name_approx, list_names, llm='default', verbose=True) :
@@ -77,6 +75,9 @@ def identify_name(name_approx, list_names, llm='default', verbose=True) :
         raise Exception('identify_name output is none of expected', list_names, 
                         '\ninput = "' + name_approx + '"', '\noutput = "' + name + '"')
     else:
-        if verbose :
-            print("Identified candidate :", name)
+        if verbose : print("Candidate :", name)
         return name
+    
+def target_name(query, list_names, llm='default', verbose=True):
+    name_approx = extract_name(query, llm='default', verbose=False)
+    return identify_name(name_approx, list_names, llm='default', verbose=True)
