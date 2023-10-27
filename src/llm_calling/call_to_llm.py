@@ -1,7 +1,9 @@
+import sys
+sys.path.append('..')
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
-import treat_chunks
-import vectorstore_lib
+from llm_calling import treat_chunks
+from vectorstore_managing import vectorstore_lib
 
 
 def create_chain(llm, prompt) :

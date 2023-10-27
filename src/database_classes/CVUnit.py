@@ -1,5 +1,7 @@
-from DBTable import DBTable
-import call_to_llm
+import sys
+sys.path.append('..')
+from database_classes.DBTable import DBTable
+from llm_calling import call_to_llm
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 

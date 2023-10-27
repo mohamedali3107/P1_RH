@@ -1,20 +1,20 @@
+import sys
+sys.path.append('..')
 import time
 import getpass
 import mysql.connector
 from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
-from Candidates import Candidates
-from CVUnit import CVUnit
-from Languages import Languages
-from prompts.prompt_extract_names import prompt_name_in_query
-from prompts.prompt_format_name import prompt_identify_name
+from database_classes.Candidates import Candidates
+from database_classes.CVUnit import CVUnit
+from database_classes.Languages import Languages
 from config_database_mysql import config_experience as experience
 from config_database_mysql import config_education as education
 from config_database_mysql import config_skills as skills
 from config_database_mysql import config_candidates
 import prompts.prompt_single_cv as pr_single
-import vectorstore_lib
-import treat_query
+from vectorstore_managing import vectorstore_lib
+from llm_calling import treat_query
 
 class CVDataBase():
 
@@ -43,7 +43,6 @@ class CVDataBase():
         self.db.database = self.name
         self.candidates = Candidates(self)  # table creation
         self.entities['languages'] = Languages(self)
-        print(education.sql_create)
         self.entities[education.table_name] = CVUnit(self, education.sql_create,
                                                      education.config_dict)
         self.entities[experience.table_name] = CVUnit(self, experience.sql_create,

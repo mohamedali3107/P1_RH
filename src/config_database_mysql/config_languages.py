@@ -1,4 +1,4 @@
-from prompts import prompt_candidates as candidates
+from config_database_mysql import config_candidates as candidates
 
 prompt_languages = """You will be provided with a Curriculum Vitae delimited by triple backsticks.
 Your task is to find the languages spoken with the corresponding proficiency level by the person in this Curriculum Vitae and provide the comprehensive list of these. If a language name is not given in English, translate it to English. If you find, in this Curriculum Vitae, a language name without a specified proficiency level, you should output 'Unknown' instead of the proficiency level.

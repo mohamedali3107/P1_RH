@@ -1,7 +1,8 @@
-from DBTable import DBTable
-from CVUnit import CVUnit
-import call_to_llm
-from prompts import prompt_languages as pr_languages
+import sys
+sys.path.append('..')
+from database_classes.DBTable import DBTable
+from database_classes.CVUnit import CVUnit
+from llm_calling import call_to_llm
 from config_database_mysql import config_languages as languages
 from langchain.prompts import PromptTemplate
 

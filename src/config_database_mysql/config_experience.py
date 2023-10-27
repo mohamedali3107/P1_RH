@@ -1,6 +1,6 @@
 import sys
 sys.path.append("..")
-from prompts import prompt_candidates as candidates
+from config_database_mysql import config_candidates as candidates
 
 prompt_experience = """
 You will be provided with a Curriculum Vitae, delimited by triple backsticks. 

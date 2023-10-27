@@ -4,7 +4,7 @@ from langchain.chat_models import ChatOpenAI
 # my modules 
 import loading.utils as utils
 import loading.load_pdf as load
-from CVDataBase import CVDataBase
+from database_classes.CVDataBase import CVDataBase
 import gradio as gr
 
 import os
@@ -13,22 +13,6 @@ from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv()) # read local .env file
 openai.api_key  = os.environ['OPENAI_API_KEY']
 
-
-# todo : faire autrement !
-# par exemple : all_fields = db.select('column_name', 'information_schema.columns', condition=f"WHERE table_schema='{db.name}' AND table_name='{db.candidates.name}'")
-all_fields = ["FileName"
-"FirstName",
-"FamilyName",
-"Gender",
-"Email",
-"PhoneNumber",
-"LinkedIn",
-"Webpage",
-"Country",
-"City"
-]
-
-list_of_names = ["Leo SOUQUET", "Justine Falque", "Robert VESOUL", "Aymeric Bernard"]
 
 ########## Parameters ##########
 

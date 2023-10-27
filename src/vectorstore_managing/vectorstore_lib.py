@@ -3,7 +3,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 import subprocess
 from langchain.vectorstores import Chroma
 # my modules
-import enrich_metadata
+from vectorstore_managing import enrich_metadata
 
 def splitting_of_docs(documents, splitter) :
     return splitter.split_documents(documents)  # list of documents (attributs page_content, metadata)

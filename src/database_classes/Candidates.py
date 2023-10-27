@@ -1,7 +1,8 @@
-from DBTable import DBTable
+import sys
+sys.path.append('..')
+from database_classes.DBTable import DBTable
 from config_database_mysql import config_candidates
-import call_to_llm
-from langchain.chat_models import ChatOpenAI
+from llm_calling import call_to_llm
 from langchain.prompts import PromptTemplate
 
 class Candidates() :
