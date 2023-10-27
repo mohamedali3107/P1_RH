@@ -39,7 +39,11 @@ class CVUnit():
                                                  retriever_type=retriever_type, llm=llm)
             outputs.append(answer)
         cols = self.entity_table.columns(include_primary=False)  # includes foreign key Candidate
-        self.entity_table.insert(cols, outputs + [filename])
+        try:
+            self.entity_table.insert(cols, outputs + [filename])
+        except:
+            print('AAAAAA', cols)
+            print(cols[0])
 
     def attributes(self, include_relation=False):
         '''Return columns except for numeric id and foreign key'''

@@ -18,7 +18,7 @@ class DBTable():
             if include_primary:
                 return [col[0] for col in cols]
             # else exclude artificial primary key of type int
-            return [col[0] for col in cols if col[3] != 'PRI' or col[1] != 'int']
+            return [col[0] for col in cols if (col[3] != 'PRI' or col[1] != 'int') and (col[3] != 'PRI' or col[1] != bytes(b'int'))]
         
     def insert(self, columns, values):
         '''Inputs columns and values may be lists of strings or just one string'''
@@ -28,9 +28,13 @@ class DBTable():
             values = [values]
         columns = ", ".join(columns)
         values = "'" + "', '".join(values) + "'"
-        self.database.execute(f"""INSERT INTO {self.name} ({columns}) 
-                                    VALUES ({values});""")
-        self.database.db.commit()
+        sql_query = f"""INSERT INTO {self.name} ({columns}) 
+                                    VALUES ({values});"""
+        try:
+            self.database.execute(sql_query)
+            self.database.db.commit()
+        except:
+            print("Cannot execute the following SQL query: \n", sql_query)
         
     def delete(self, filename):
         if self.database.candidates.primary_key in self.columns(include_primary=True):

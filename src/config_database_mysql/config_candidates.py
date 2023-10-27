@@ -111,8 +111,8 @@ dict_candidates = {
         "PhoneNumber": {'prompt': prompt_phone, 'type': sql_phone},
         "LinkedIn": {'prompt': prompt_linkedin, 'type': sql_linkedin},
         "Webpage": {'prompt': prompt_webpage, 'type': sql_webpage},
-        "Country": {'prompt': prompt_country, 'type': sql_country},
-        "City": {'prompt': prompt_city, 'type': sql_city}
+        #"Country": {'prompt': prompt_country, 'type': sql_country},
+        #"City": {'prompt': prompt_city, 'type': sql_city}
         }
 
 table_name = "candidates"
