@@ -108,6 +108,10 @@ class CVDataBase():
         if verbose:
             print("\nFilling the database with " + filename +" ...\n")
         ## names of files already in the database (but not yet recorded in the CVDataBase object):
+        if force_refill:
+            for entity in self.entities:
+                self.entities[entity].delete(filename)
+            self.candidates.delete(filename)
         known_files = self.select(columns=self.candidates.primary_key, table=self.candidates.name)
         known_files = [file[0] for file in known_files]
         if filename in known_files:
@@ -124,10 +128,10 @@ class CVDataBase():
         else:
             vectordb = vectorstore_lib.create_vectordb_single(doc)
             self.candidates.fill(filename, vectordb, retriever_type='vectordb',
-                                 llm='default', verbose=True)
+                                llm='default', verbose=True)
             for entity in self.entities:
                 self.entities[entity].fill(filename, vectordb, 
-                                           retriever_type="vectordb", llm='default', verbose=True)
+                                        retriever_type="vectordb", llm='default', verbose=True)
 
     def outputs_for_each_cv(self, question: str, fields_dict: dict, 
                                         chain='default', llm='default', verbose=False):

@@ -47,3 +47,8 @@ class CVUnit():
         if self.has_relation and include_relation:
             attrib.extend(self.relation_table.columns(include_primary=False))
         return attrib
+    
+    def delete(self, filename):
+        self.entity_table.delete(filename)
+        if self.has_relation:
+            self.relation_table.delete(filename)

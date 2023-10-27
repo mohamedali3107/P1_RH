@@ -42,6 +42,7 @@ class Languages(CVUnit):
                                                 languages.relation_col],
                                        [language, filename, language_level]
                                        )
+            
     # todo: plutôt faire hériter de CVUnits, mais régler le sort du dict avant
     def attributes(self, include_relation=False):
         '''Return columns except for numeric id and foreign key'''
@@ -50,3 +51,8 @@ class Languages(CVUnit):
             attrib_rel = self.relation_table.columns(include_primary=False)
             attrib.extend([col for col in attrib_rel if col != self.entity_primary_key])
         return attrib
+    
+    def delete(self, filename):
+        self.entity_table.delete(filename)
+        if self.has_relation:
+            self.relation_table.delete(filename)

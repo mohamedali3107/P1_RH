@@ -79,11 +79,12 @@ def demo_fill(db, data_dir, filename) -> tuple:
     db.add_cv(doc)
     # candidates_values and languages_values are lists corresponding to a single row, hence the [0]
     candidates_values = db.select('*', db.candidates.name, condition=f"WHERE {db.candidates.primary_key}='{data_dir+filename}'")[0] 
-    languages_values = db.select(['NameLanguage, LanguageLevel'], db.entities['languages'].relation_name, condition=f"WHERE Candidate='{data_dir+filename}'")[0]
+    #languages_values = db.select(['NameLanguage, LanguageLevel'], db.entities['languages'].relation_name, condition=f"WHERE Candidate='{data_dir+filename}'")[0]
     return candidates_values
 
 def run_demo(data_dir, demo_questions):
     filenames = utils.list_of_pdf_files(data_dir)
+    print(filenames)
     db = CVDataBase()
     db.initialize()
     column_names = [res[0] for res in db.select('column_name', 'information_schema.columns', condition=f"WHERE table_schema='{db.name}' AND table_name='{db.candidates.name}'")]

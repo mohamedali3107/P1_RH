@@ -52,3 +52,6 @@ class Candidates() :
 
     def attributes(self):
         return self.table.columns()
+    
+    def delete(self, filename):
+        self.table.delete(filename)

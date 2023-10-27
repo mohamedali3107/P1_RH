@@ -32,4 +32,10 @@ class DBTable():
                                     VALUES ({values});""")
         self.database.db.commit()
         
+    def delete(self, filename):
+        if self.database.candidates.primary_key in self.columns(include_primary=True):
+            self.database.execute(f"""DELETE FROM {self.name}
+                                   WHERE {self.database.candidates.primary_key} = '{filename}';""")
+            self.database.db.commit()
+            
     # todo : fill, update, interrogate
