@@ -8,6 +8,7 @@ from database_classes.CVDataBase import CVDataBase
 from config_database_mysql import config_experience as experience
 from config_database_mysql import config_education as education
 from config_database_mysql import config_skills as skills
+from config_database_mysql import config_candidates as candidates 
 import gradio as gr
 
 import os
@@ -111,7 +112,7 @@ def run_demo(data_dir, demo_questions, with_gradio=True):
     db.initialize()
 
     if with_gradio:
-        candidates_column_names = [column for (column,) in db.select('column_name', 'information_schema.columns', condition=f"WHERE table_schema='{db.name}' AND table_name='{db.candidates.name}'")]
+        candidates_column_names = list(candidates.dict_candidates.keys())
         with gr.Blocks() as demo:
             gr.Markdown(
                 f"""
