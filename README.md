@@ -36,7 +36,6 @@ Todo: USAGE + data + enhance description.
 
 This project is done in the context of the Digital Tech year Fall 2023 and consists in a CV parsing method that allows both to recover useful information in a database and asking questions over a pool of candidates using this database.
 
-
 ### Built With
 
 The method is coded and Python and makes use of LangChain pipelines with GTP-3.5 running. 
@@ -65,9 +64,11 @@ The method is coded and Python and makes use of LangChain pipelines with GTP-3.5
 
 
 <!-- REPO STRUCTURE -->
-## Repo structure
+## Repo structure and versions
 
 Main demo scripts can be found in ./src, utilities and loading methods are located in ./src/loading. Promptq to be fed to the LLM for each task are located in the .src/prompts folder.
+
+The repo also contains two former versions: the V0 provides an interface to ask questions directly over a pool of CVs loaded as pdf documents while the V1 enables to extract the usual information into a csv file on which the user can then ask questions. The final version (src/main.py) replaces this csv with a MySQL database.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -75,9 +76,8 @@ Main demo scripts can be found in ./src, utilities and loading methods are locat
 ## Usage
 
 1. Connect to MySQL
-2. Add the CVs to be parsed to a new ./data folder
-3. [Optional] Run .src/fill_mysqldb.py to fill the database with the info parsed from the CVs
-4. Run multi_gradio to ask questions on your pool of CVs
+2. Add the CVs to be parsed to a new data/ folder
+3. Run src/main.py to fill the database with the info parsed from the CVs and ask questions over this database
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
