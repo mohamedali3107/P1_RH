@@ -134,13 +134,14 @@ def run_demo(data_dir, demo_questions, with_gradio=True):
                 """
                 This Q&A engine uses the information extracted beforehand from the following CVs:
                 """)
-                with gr.Row():
-
-                    display_list_of_cvs = gr.Checkbox(label = "Display the list of CVs")
-                    list_of_cvs = gr.Textbox(
-                                    label="List of CVs:"
-                            )
-                    list_of_cvs.change(lambda bool: display_list(filenames, bool), display_list_of_cvs, list_of_cvs)
+                # with gr.Row():
+                #     with gr.Column(scale=1):
+                #         display_list_of_cvs = gr.Checkbox(label = "Display the list of CVs")
+                #     with gr.Column(scale=2):
+                #         list_of_cvs = gr.Textbox(
+                #                     label="List of CVs:"
+                #             )
+                #         list_of_cvs.change(lambda bool: display_list(filenames, bool), display_list_of_cvs, list_of_cvs)
                 with gr.Row():
                     with gr.Column():
                         question_from_sample = gr.Dropdown(demo_questions, label="Choose a question:")
@@ -148,12 +149,12 @@ def run_demo(data_dir, demo_questions, with_gradio=True):
                         submit_btn_question_from_sample = gr.Button("Generate answer")
                         answer_to_question_from_sample = gr.Textbox(label = "Answer:")
                         submit_btn_question_from_sample.click(fn=lambda query, force_refill: fill_and_ask(db, data_dir, query, force_refill), inputs=[question_from_sample, check_force_refill_question_from_sample], outputs=answer_to_question_from_sample, api_name="Answer to question from sample")
-                    with gr.Column():
-                        user_question = gr.Textbox(label="Ask your own question:") 
-                        check_force_refill_user_question = gr.Checkbox(label="Refill the database before generating an answer")
-                        submit_btn_user_question = gr.Button("Generate answer")
-                        answer_to_user_question = gr.Textbox(label = "Answer:")
-                        submit_btn_user_question.click(fn=lambda query, force_refill: fill_and_ask(db, data_dir, query, force_refill), inputs=[user_question, check_force_refill_user_question], outputs=answer_to_user_question, api_name="Answer from user question")
+                    # with gr.Column():
+                    #     user_question = gr.Textbox(label="Ask your own question:") 
+                    #     check_force_refill_user_question = gr.Checkbox(label="Refill the database before generating an answer")
+                    #     submit_btn_user_question = gr.Button("Generate answer")
+                    #     answer_to_user_question = gr.Textbox(label = "Answer:")
+                    #     submit_btn_user_question.click(fn=lambda query, force_refill: fill_and_ask(db, data_dir, query, force_refill), inputs=[user_question, check_force_refill_user_question], outputs=answer_to_user_question, api_name="Answer from user question")
         demo.launch(inbrowser=True)
     
     else:
